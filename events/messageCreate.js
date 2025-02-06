@@ -1,5 +1,22 @@
 const db = require('../utils/db');
 const rollensystem = require('../utils/rollensystem');
+const fs = require('fs');
+const path = require('path');
+const fetch = require('node-fetch');
+
+async function saveAttachment(attachment) {
+    const response = await fetch(attachment.url);
+    const buffer = await response.buffer();
+    const filePath = path.join(__dirname, '../media', attachment.name);
+
+    fs.writeFile(filePath, buffer, (err) => {
+        if (err) {
+            console.error(`❌ Fehler beim Speichern des Bildes: ${err}`);
+        } else {
+            console.log(`✅ Bild gespeichert: ${filePath}`);
+        }
+    });
+}
 
 module.exports = {
     name: 'messageCreate',
@@ -45,6 +62,12 @@ module.exports = {
 
         if (message.guild && message.guild.id === MAIN_SERVER_ID && message.channel.id === MAIN_CHANNEL_ID) {
             console.log(`📢 Nachricht wird an Partner-Server gesendet: ${message.content}`);
+
+            if (message.attachments.size > 0) {
+                message.attachments.forEach(attachment => {
+                    saveAttachment(attachment);
+                });
+            }
 
             db.all(`SELECT target_channel FROM partner_servers`, [], async (err, rows) => {
                 if (err) {

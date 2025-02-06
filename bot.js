@@ -29,11 +29,14 @@ global.client = new Client({
 client.commands = new Collection();
 
 // **Commands laden**
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
-    console.log(`➡️ Command geladen: ${command.name}`);
+const commandFolders = fs.readdirSync('./commands');
+for (const folder of commandFolders) {
+    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const command = require(`./commands/${folder}/${file}`);
+        client.commands.set(command.name, command);
+        console.log(`➡️ Command geladen: ${command.name}`);
+    }
 }
 
 // **Events laden**
@@ -48,7 +51,6 @@ for (const file of eventFiles) {
         });
     }
 }
-
 
 // **Webserver starten (nachdem der Client definiert wurde)**
 require('./webserver');
