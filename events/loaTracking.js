@@ -8,7 +8,7 @@ module.exports = {
         if (message.author.bot || !message.guild) return;
 
         // 📌 Channel-ID für LOA Nachrichten (Hier anpassen!)
-        const LOA_CHANNEL_ID = '1336457669271097457';
+        const LOA_CHANNEL_ID = '1286192943274655765';
 
         if (message.channel.id !== LOA_CHANNEL_ID) return;
 
@@ -31,7 +31,20 @@ module.exports = {
             const user = await message.guild.members.fetch(userId);
             const username = user ? user.user.username : "Unbekannt";
 
-            // 📌 Daten in die Datenbank speichern
+            // Alte LOA speichern
+            db.run(
+                `INSERT INTO old_loa (user_id, username, from_date, to_date, reason) VALUES (?, ?, ?, ?, ?)`,
+                [userId, username, fromDate, toDate, reason],
+                (err) => {
+                    if (err) {
+                        console.error('❌ Fehler beim Speichern der alten LOA:', err);
+                    } else {
+                        console.log(`✅ Alte LOA gespeichert: ${username} von ${fromDate} bis ${toDate}`);
+                    }
+                }
+            );
+
+            // Daten in die Datenbank speichern
             db.run(
                 `INSERT INTO loa (user_id, username, from_date, to_date, reason) VALUES (?, ?, ?, ?, ?)`,
                 [userId, username, fromDate, toDate, reason],

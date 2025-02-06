@@ -1,5 +1,13 @@
 <h1 class="glow-text">👥 Benutzerübersicht</h1>
 
+<!-- Suchfeld -->
+<div class="search-container">
+    <form action="/user" method="get">
+        <input type="text" name="search" placeholder="Nach Soldaten Name oder Benutzername suchen..." value="<%= searchTerm %>">
+        <button type="submit">🔍 Suchen</button>
+    </form>
+</div>
+
 <!-- 📜 Container für die Tabelle -->
 <div class="container">
     <div class="user-table-container">

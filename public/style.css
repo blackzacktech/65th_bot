@@ -435,3 +435,74 @@ ul {
 ul li {
     padding: 5px 0; /* Etwas Abstand zwischen den Listeneinträgen */
 }
+
+/* Suchfeld-Stil */
+.search-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.search-container input[type="text"] {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px; /* Breite des Suchfelds */
+    transition: border-color 0.3s;
+}
+
+.search-container input[type="text"]:focus {
+    border-color: #ffcc00; /* Gold-Orange bei Fokus */
+    outline: none; /* Entfernt den Standard-Fokus-Rahmen */
+}
+
+.search-container button {
+    padding: 10px 15px;
+    font-size: 1em;
+    background-color: #ffcc00; /* Gold-Orange */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-container button:hover {
+    background-color: #ffd700; /* Helleres Gold bei Hover */
+}
+
+/* Benutzer-Tabelle */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1.2em;
+    min-width: 600px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(211, 47, 47, 0.6);
+}
+
+.user-table thead tr {
+    background: rgba(211, 47, 47, 0.9);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.user-table th, .user-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(211, 47, 47, 0.4);
+    white-space: nowrap;
+}
+
+.user-table tbody tr {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.3s;
+}
+
+.user-table tbody tr:hover {
+    background: rgba(255, 0, 0, 0.3);
+}

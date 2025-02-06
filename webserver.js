@@ -291,12 +291,19 @@ app.get('/:discordUserId/instructions', (req, res) => {
 
 // 📌 Route für alle Benutzer in einer übersichtlichen Tabelle
 app.get('/user', (req, res) => {
-    db.all('SELECT * FROM main_server_users', [], (err, users) => {
+    const searchTerm = req.query.search || ''; // Suchbegriff aus den Query-Parametern abrufen
+
+    // SQL-Abfrage anpassen, um nach Soldaten Name oder Benutzername zu filtern
+    db.all(`
+        SELECT * FROM main_server_users 
+        WHERE "Soldaten Name" LIKE ? OR username LIKE ? 
+        ORDER BY "Soldaten Name" ASC
+    `, [`%${searchTerm}%`, `%${searchTerm}%`], (err, users) => {
         if (err) {
             console.error("❌ Fehler beim Abrufen der Benutzer:", err);
             return res.status(500).send("Fehler beim Laden der Benutzerdaten.");
         }
-        res.render('users', { title: "Benutzerübersicht", users });
+        res.render('users', { title: "Benutzerübersicht", users, searchTerm }); // Suchbegriff an die Ansicht übergeben
     });
 });
 

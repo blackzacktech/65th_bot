@@ -2,8 +2,6 @@ const db = require('../utils/db');
 const path = require('path'); 
 const fs = require('fs');
 const rollensystem = require('../utils/rollensystem');
-const fs = require('fs');
-const path = require('path');
 const fetch = require('node-fetch');
 
 async function saveAttachment(attachment) {

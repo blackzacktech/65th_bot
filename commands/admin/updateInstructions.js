@@ -1,12 +1,13 @@
-const db = require('../utils/db');
+const db = require('../../utils/db');
 const moment = require('moment');
+require('dotenv').config();
 
 module.exports = {
     name: 'updateinstructions',
     description: 'Überprüft alle alten Einweisungen im Channel und speichert sie in die Datenbank.',
-    permission: 'freigabe2', // ✅ Nur Admins können den Command ausführen
+    permission: 'freigabe2',
     async execute(message) {
-        const INSTRUCTION_CHANNEL_ID = '1336697115610452049';
+        const INSTRUCTION_CHANNEL_ID = process.env.INSTRUCTION_CHANNEL_ID;
         const channel = message.client.channels.cache.get(INSTRUCTION_CHANNEL_ID);
 
         if (!channel) {

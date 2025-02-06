@@ -8,7 +8,9 @@ module.exports = {
         if (message.author.bot || !message.guild) return;
 
         // 📌 Channel-ID für Einweisungsnachrichten (Anpassen!)
-        const INSTRUCTION_CHANNEL_ID = '1336697115610452049';
+        const INSTRUCTION_CHANNEL_ID = process.env.INSTRUCTION_CHANNEL_ID;
+
+        if (message.channel.id !== INSTRUCTION_CHANNEL_ID) return;
 
         if (message.content.includes('**__ Einweisung__**')) {
             console.log("📌 Einweisung erkannt, versuche zu speichern...");
