@@ -1,4 +1,6 @@
 const db = require('../utils/db');
+const path = require('path'); 
+const fs = require('fs');
 const rollensystem = require('../utils/rollensystem');
 const fs = require('fs');
 const path = require('path');
@@ -22,6 +24,32 @@ module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
         if (message.author.bot) return;
+
+        // ✅ **DM (Private Nachricht) speichern**
+        if (message.channel.isDMBased()) {
+            console.log(`📩 DM erhalten von ${message.author.username}: ${message.content}`);
+
+            const dmFilePath = path.join(__dirname, '../utils/files/dm.txt');
+            const timestamp = new Date();
+            const formattedDate = `${timestamp.getDate().toString().padStart(2, '0')}.${(timestamp.getMonth() + 1).toString().padStart(2, '0')}.${timestamp.getFullYear()} ${timestamp.getHours().toString().padStart(2, '0')}:${timestamp.getMinutes().toString().padStart(2, '0')}`;
+
+            const logEntry = `
+-----------------------------------------
+Von wem: ${message.author.username}
+Von wem (ID): ${message.author.id}
+Wann: ${formattedDate}
+Text Inhalt: ${message.content}
+`;
+
+            // 🔄 **Bestehende Datei lesen & aktualisieren**
+            fs.appendFile(dmFilePath, logEntry, (err) => {
+                if (err) {
+                    console.error('❌ Fehler beim Speichern der DM:', err);
+                } else {
+                    console.log('✅ DM gespeichert.');
+                }
+            });
+        }
 
         // ✅ **COMMAND HANDLER**
         if (message.content.startsWith('!')) {
