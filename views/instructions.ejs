@@ -1,0 +1,18 @@
+<h1 class="glow-text">📜 Einweisungen</h1>
+
+<div class="container">
+    <% if (instructions.length === 0) { %>
+        <p>✅ Keine Einweisungen gefunden.</p>
+    <% } else { %>
+        <ul class="stat-list">
+            <% instructions.forEach(instruction => { %>
+                <li>
+                    👤 <b>Eingewiesener:</b> <%= instruction.trainee_username %> (<@<%= instruction.trainee_user_id %>>) <br>
+                    🎮 <b>VRC-Name:</b> <%= instruction.vrc_name %> <br>
+                    🏅 <b>Ausbilder:</b> <%= instruction.instructor_username %> (CT-<%= instruction.ct_number %>) <br>
+                    📅 <b>Datum:</b> <%= new Date(instruction.timestamp).toLocaleDateString("de-DE") %> <br>
+                </li>
+            <% }); %>
+        </ul>
+    <% } %>
+</div>

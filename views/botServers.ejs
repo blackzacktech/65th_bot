@@ -1,0 +1,18 @@
+<h1 class="glow-text">🌍 Server, in denen der Bot ist</h1>
+
+<div class="container">
+    <% if (servers.length === 0) { %>
+        <p>🚫 Der Bot ist in keinem Server.</p>
+    <% } else { %>
+        <ul class="stat-list">
+            <% servers.forEach(server => { %>
+                <li>
+                    <b>🛡️ Name:</b> <%= server.name %> <br>
+                    <b>📌 Server ID:</b> <%= server.id %> <br>
+                    <b>👥 Mitglieder:</b> <%= server.member_count %> <br>
+                    <b>👑 Besitzer ID:</b> <%= server.owner_id %> <br>
+                </li>
+            <% }); %>
+        </ul>
+    <% } %>
+</div>

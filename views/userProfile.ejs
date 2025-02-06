@@ -1,0 +1,34 @@
+<h1 class="glow-text">👤 Profil von <%= username %></h1>
+
+<!-- Profilbild -->
+<div class="container image-container">
+    <img src="<%= avatarURL %>" alt="Profilbild von <%= username %>" class="profile-image">
+</div>
+
+<!-- Benutzerinfos -->
+<div class="container">
+    <h2>🛡️ Rollen: <span class="highlight"><%= roles %></span></h2>
+    <h3>📅 Beigetreten am: <span class="highlight"><%= joinedAt %></span></h3>
+</div>
+
+<!-- Server-Aktivität -->
+<div class="container">
+    <h3>📊 <span class="highlight">Server-Interaktionen</span></h3>
+    <ul class="stat-list">
+        <li>💬 <b>Nachrichten gesendet:</b> <%= messagesSent %></li>
+        <li>🎤 <b>Voice-Minuten:</b> <%= voiceMinutes %></li>
+        <li>🌟 <b>Aktivitätspunkte:</b> <%= activityPoints %></li>
+    </ul>
+</div>
+
+<!-- LOA Übersicht -->
+<div class="container">
+    <h3>📅 <span class="highlight">LOA Abmeldungen</span></h3>
+    <p>📝 Anzahl: <a href="/<%= userId %>/loa"><b><%= loaCount %></b></a></p>
+</div>
+
+<!-- 🔹 Einweisungsübersicht (NEU) -->
+<div class="container">
+    <h3>📜 <span class="highlight">Einweisungen</span></h3>
+    <p>📌 Anzahl: <a href="/<%= userId %>/instructions"><b><%= instructionCount %></b></a></p>
+</div>

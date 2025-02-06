@@ -1,0 +1,19 @@
+<h1 class="glow-text">📜 Aktuelle Abmeldungen</h1>
+
+<!-- 📌 Liste aller aktuellen Abmeldungen -->
+<div class="container">
+    <% if (loaData.length === 0) { %>
+        <p>✅ Aktuell keine Abmeldungen.</p>
+    <% } else { %>
+        <ul class="stat-list">
+            <% loaData.forEach(loa => { %>
+                <li>
+                    <b>👤 <%= loa.username %></b> <br>
+                    📅 <b>Von:</b> <%= new Date(loa.from_date).toLocaleDateString("de-DE") %> <br>
+                    📅 <b>Bis:</b> <%= new Date(loa.to_date).toLocaleDateString("de-DE") %> <br>
+                    📝 <b>Grund:</b> <%= loa.reason %> <br>
+                </li>
+            <% }); %>
+        </ul>
+    <% } %>
+</div>

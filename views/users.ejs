@@ -1,0 +1,33 @@
+<h1 class="glow-text">👥 Benutzerübersicht</h1>
+
+<!-- 📜 Container für die Tabelle -->
+<div class="container">
+    <div class="user-table-container">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Soldaten Name</th>
+                    <th>Benutzername</th>
+                    <th>📨</th>
+                    <th>🎙️</th>
+                    <th>🏆</th>
+                    <th>🔗</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user['Soldaten Name'] || "N/A" %></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.messages_sent %></td>
+                        <td><%= user.voice_minutes %></td>
+                        <td><%= user.activity_points %></td>
+                        <td>
+                            <a href="/<%= user.user_id %>/info" class="profile-link">🔍</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>

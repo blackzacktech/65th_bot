@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <!-- 🍔 Hamburger Menü Button -->
+    <div class="menu-icon" onclick="toggleMobileMenu()">☰</div>
+
+    <!-- 🔹 Navigation -->
+    <div class="navbar">
+        <div class="navbar-links">
+            <a href="/" class="active">🏠 Home</a>
+            <a href="/wiki">📜 Wiki</a>
+            <a href="/venator">🚀 Venator Base</a>
+            <a href="/user">🛡️ Discord Mitglieder</a>
+            <a href="/loa">📅 Abmeldungen</a>
+            <a href="https://discord.gg/YOUR_DISCORD_INVITE" target="_blank" class="discord-button">🎮 Discord</a>
+        </div>
+    </div>
+
+    <!-- 📱 Mobiles Menü -->
+    <div class="mobile-menu" id="mobileMenu">
+        <span class="close-menu" onclick="toggleMobileMenu()">✖</span>
+        <a href="/">🏠 Home</a>
+        <a href="/wiki">📜 Wiki</a>
+        <a href="/venator">🚀 Venator Base</a>
+        <a href="/user">🛡️ Discord Mitglieder</a>
+        <a href="/loa">📅 Abmeldungen</a>
+        <a href="https://discord.gg/YOUR_DISCORD_INVITE" target="_blank">🎮 Discord</a>
+    </div>
+
+    <!-- 📌 Hauptinhalt der Seiten -->
+    <div class="content">
+        <%- body %>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById("mobileMenu");
+            if (menu.style.display === "flex") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "flex";
+            }
+        }
+    </script>
+
+</body>
+</html>

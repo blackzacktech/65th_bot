@@ -1,0 +1,14 @@
+{
+    "dbcode.connections": [
+        {
+            "connectionId": "XeP_fh8maJC_k_uGuWuXf",
+            "name": "65th Discord Bot",
+            "driver": "sqlite",
+            "socket": "/root/Projekte/65th_bot/utils/database/database.sqlite",
+            "driverOptions": {
+                "extensions": []
+            },
+            "connectionType": "socket"
+        }
+    ]
+}

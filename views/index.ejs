@@ -1,0 +1,67 @@
+<h1 class="glow-text">Willkommen bei der 65th Coruscant Guard</h1>
+
+<!-- 🏅 Über uns -->
+<div class="container">
+    <h2>🌟 Wer sind wir?</h2>
+    <p>Die <b>65th Coruscant Guard</b> ist eine taktische Eliteeinheit, die sich auf <b>Star Wars Roleplay</b> in VRChat spezialisiert hat.</p>
+    <p>Unsere Missionen führen uns an die gefährlichsten Orte der Galaxis. Wir kämpfen, verteidigen und schützen die Ordnung der Republik!</p>
+</div>
+
+<!-- 🎖️ Was macht uns besonders? -->
+<div class="container">
+    <h2>🎖️ Warum solltest du uns beitreten?</h2>
+    <ul class="benefits-list">
+        <li>⚔️ <b>Realistisches Militär-RP:</b> Lebe die Star Wars-Erfahrung.</li>
+        <li>🌎 <b>Eigene VRChat-Base:</b> Venator-Class Star Destroyer für Einsätze & Training.</li>
+        <li>🏆 <b>Aufstiegsmöglichkeiten:</b> Verdiene Ränge & werde Anführer.</li>
+        <li>📢 <b>Regelmäßige Events:</b> Spannende Missionen & Rollenspiel-Szenarien.</li>
+    </ul>
+</div>
+
+<!-- 🎮 Wie beitreten? -->
+<div class="container">
+    <h2>🎮 Wie kannst du beitreten?</h2>
+    <p>Jeder kann Teil der 65th Coruscant Guard werden! Werde Teil der Truppe und kämpfe an vorderster Front.</p>
+    <a href="https://discord.gg/YOUR_DISCORD_INVITE" class="discord-join">🎮 Jetzt beitreten!</a>
+</div>
+
+<!-- 📊 Server Statistik -->
+<div class="container">
+    <h2>📊 Server Statistik</h2>
+    <ul class="stat-list">
+        <li>👥 <b>Mitglieder:</b> <%= serverStats.totalMembers %></li>
+        <li>💬 <b>Gesendete Nachrichten:</b> <%= serverStats.totalMessages %></li>
+        <li>🎙️ <b>Gesprochene Minuten:</b> <%= serverStats.totalVoiceMinutes %></li>
+    </ul>
+</div>
+
+<!-- 🏆 Aktivste Mitglieder -->
+<div class="container">
+    <h2>🏆 Die Besten der Besten</h2>
+    <table class="leaderboard-table">
+        <tr>
+            <th>Platz</th>
+            <th>Benutzer</th>
+            <th>Nachrichten</th>
+            <th>Voice Minuten</th>
+            <th>Gesamt Punkte</th>
+        </tr>
+        <% leaderboard.forEach((user, index) => { %>
+            <tr>
+                <td>🥇 <%= index + 1 %></td>
+                <td><%= user.username %></td>
+                <td><%= user.messages_sent || 0 %></td>
+                <td><%= user.voice_minutes || 0 %></td>
+                <td>⭐ <%= user.total_score || 0 %></td>
+            </tr>
+        <% }); %>
+    </table>
+</div>
+
+<!-- 🚀 Erkunde unsere Venator-Base -->
+<div class="container">
+    <h2>🚀 Erkunde unsere Venator-Base</h2>
+    <p>Die Venator-Class Star Destroyer Base ist das Herz unserer Einheit. Hier trainieren wir, planen Missionen und besprechen Einsätze.</p>
+    
+    <a href="/venator" class="explore-button">🌌 Venator-Base ansehen</a>
+</div>

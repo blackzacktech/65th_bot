@@ -1,0 +1,57 @@
+<h1 class="glow-text">🚀 Venator Base Informationen</h1>
+
+<!-- 🖼️ Venator Base Bild -->
+<div class="container image-container">
+    <img id="venatorImage" alt="Venator Base" class="venator-image">
+</div>
+
+<script>
+    async function loadVenatorImage() {
+        try {
+            const response = await fetch('/venator-image');
+            const data = await response.json();
+            if (data.imageUrl) {
+                document.getElementById('venatorImage').src = data.imageUrl;
+            } else {
+                document.getElementById('venatorImage').src = "/default-venator.jpg";
+            }
+        } catch (error) {
+            console.error('❌ Fehler beim Laden des Venator-Bildes:', error);
+            document.getElementById('venatorImage').src = "/default-venator.jpg";
+        }
+    }
+    loadVenatorImage();
+</script>
+
+<!-- 🏷️ Allgemeine Infos -->
+<div class="container">
+    <h2><span class="highlight">Name:</span> <%= venatorData.name %></h2>
+    <h3><span class="highlight">Autor:</span> <%= venatorData.authorName %></h3>
+    <p><b>📜 Beschreibung:</b> <%= venatorData.description %></p>
+</div>
+
+<!-- 📊 Statistik -->
+<div class="container">
+    <h3>📊 <span class="highlight">Statistik:</span></h3>
+    <ul class="stat-list">
+        <li>👥 <b>Spieler Online:</b> <%= venatorData.occupants %></li>
+        <li>🎮 <b>Instanzen:</b> <%= venatorData.instances %></li>
+        <li>⭐ <b>Favoriten:</b> <%= venatorData.favorites %></li>
+        <li>👀 <b>Besuche:</b> <%= venatorData.visits %></li>
+        <li>🔥 <b>Heat:</b> <%= venatorData.heat %></li>
+        <li>📢 <b>Popularität:</b> <%= venatorData.popularity %></li>
+        <li>🏆 <b>Empfohlene Kapazität:</b> <%= venatorData.recommendedCapacity %></li>
+        <li>📅 <b>Letztes Update:</b> <span id="updatedTime"></span></li>
+    </ul>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const updatedTime = "<%= venatorData.updated_at %>";
+        if (updatedTime) {
+            document.getElementById("updatedTime").innerText = new Date(updatedTime).toLocaleString("de-DE");
+        } else {
+            document.getElementById("updatedTime").innerText = "Kein Datum verfügbar";
+        }
+    });
+</script>
