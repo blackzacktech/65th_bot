@@ -1,24 +1,30 @@
 const db = require('../../utils/db');
 const moment = require('moment');
+require('dotenv').config();
 
 module.exports = {
     name: 'saveoldloa',
-    description: 'Durchsucht den LOA-Channel nach alten Abmeldungen und speichert sie in der Datenbank.',
+    description: 'Durchsucht den LOA-Channel im Main-Server nach alten Abmeldungen und speichert sie in der SQLite-Datenbank.',
     permission: 'freigabe2',
     async execute(message) {
-        const LOA_CHANNEL_ID = '1286192943274655765'; // Channel-ID für LOA Nachrichten
-        const channel = message.client.channels.cache.get(LOA_CHANNEL_ID);
+        const MAIN_SERVER_ID = process.env.MAIN_SERVER_ID;
+        const LOA_CHANNEL_ID = process.env.LOA_CHANNEL_ID;
 
+        const mainGuild = message.client.guilds.cache.get(MAIN_SERVER_ID);
+        if (!mainGuild) {
+            return message.reply("❌ Fehler: Der Main-Server wurde nicht gefunden!");
+        }
+
+        const channel = mainGuild.channels.cache.get(LOA_CHANNEL_ID);
         if (!channel) {
             return message.reply("❌ Fehler: Der LOA-Channel wurde nicht gefunden.");
         }
 
-        message.reply("🔄 Starte das Scannen aller alten LOA...");
-
         let messages = [];
         let lastMessageId = null;
 
-        // Nachrichten abrufen (bis alle durch sind)
+        await mainGuild.members.fetch();
+
         while (true) {
             const fetchedMessages = await channel.messages.fetch({ limit: 100, before: lastMessageId });
             if (fetchedMessages.size === 0) break;
@@ -27,48 +33,77 @@ module.exports = {
             lastMessageId = fetchedMessages.last().id;
         }
 
-        console.log(`🔍 ${messages.length} Nachrichten gefunden!`);
+        let savedCount = 0;
 
         for (const msg of messages) {
-            if (msg.content.includes('**__Abmeldung [LOA -leave of absence-]__**')) {
-                console.log(`📌 Verarbeite Nachricht von ${msg.author.username}...`);
+            const userId = msg.author.id;
+            const username = msg.author.username;
+            let content = msg.content;
 
-                const regex = /\*\*Ab Wann:\*\*(.+?)\n\*\*Bis Wann:\*\*(.+?)\n\*\*Ausführlicher grund für die Abmeldung:\*\*(.+?)\n\*\*Wer:\*\* <@(\d+)>/s;
-                const match = msg.content.match(regex);
+            // 🛠 **Robuste Datumserkennung**
+            const dateRegex = /\*\*Ab Wann:\*\*[\s]*(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{4})[\s\S]*?\*\*Bis Wann:\*\*[\s]*(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{4})/i;
+            const singleDateRegex = /\*\*Ab Wann:\*\*[\s]*(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{4})/i;
 
-                if (!match) {
-                    console.log("❌ Keine Übereinstimmung mit dem Regex!");
-                    continue;
+            let fromDate = "Unbekannt";
+            let toDate = "Unbekannt";
+
+            let match = content.match(dateRegex);
+            if (match) {
+                fromDate = match[1];
+                toDate = match[2];
+            } else {
+                let singleMatch = content.match(singleDateRegex);
+                if (singleMatch) {
+                    fromDate = toDate = singleMatch[1];
                 }
-
-                let fromDate = match[1].trim();
-                let toDate = match[2].trim();
-                const reason = match[3].trim();
-                const userId = match[4];
-
-                // Konvertiere Datum in `YYYY-MM-DD` für SQL-Kompatibilität
-                fromDate = moment(fromDate, 'DD.MM.YYYY').format('YYYY-MM-DD');
-                toDate = moment(toDate, 'DD.MM.YYYY').format('YYYY-MM-DD');
-
-                // Benutzername abrufen
-                const user = await msg.guild.members.fetch(userId);
-                const username = user ? user.user.username : "Unbekannt";
-
-                // Alte LOA speichern
-                db.run(
-                    `INSERT INTO loa (user_id, username, from_date, to_date, reason) VALUES (?, ?, ?, ?, ?)`,
-                    [userId, username, fromDate, toDate, reason],
-                    (err) => {
-                        if (err) {
-                            console.error('❌ Fehler beim Speichern der alten LOA:', err);
-                        } else {
-                            console.log(`✅ Alte LOA gespeichert: ${username} von ${fromDate} bis ${toDate}`);
-                        }
-                    }
-                );
             }
+
+            // 🔄 **Konvertiere Datum in `YYYY-MM-DD`**
+            fromDate = moment(fromDate, ["DD.MM.YYYY", "D.M.YYYY", "YYYY-MM-DD"], true).isValid()
+                ? moment(fromDate, ["DD.MM.YYYY", "D.M.YYYY", "YYYY-MM-DD"], true).format("YYYY-MM-DD")
+                : "Unbekannt";
+
+            toDate = moment(toDate, ["DD.MM.YYYY", "D.M.YYYY", "YYYY-MM-DD"], true).isValid()
+                ? moment(toDate, ["DD.MM.YYYY", "D.M.YYYY", "YYYY-MM-DD"], true).format("YYYY-MM-DD")
+                : "Unbekannt";
+
+            // 🔍 **Grund extrahieren**
+            let reasonMatch = content.match(/(?:Ausführlicher Grund für die Abmeldung:|Grund:)\s*(.+)/i);
+            let reason = reasonMatch ? reasonMatch[1].trim() : "Kein Grund angegeben";
+
+            if (reason.length < 5) {
+                reason = "Kein Grund angegeben";
+            }
+
+            const timestamp = moment(msg.createdTimestamp).format('YYYY-MM-DD HH:mm:ss');
+
+            // 🛠 **Debugging: Konsolen-Ausgabe der extrahierten Daten**
+            console.log(`📌 LOA gefunden:`);
+            console.log(`   👤 User: ${username} (${userId})`);
+            console.log(`   📅 Von: ${fromDate}`);
+            console.log(`   📅 Bis: ${toDate}`);
+            console.log(`   📝 Grund: ${reason}`);
+
+            // Falls das Datum oder der Grund nicht erkannt wurde, logge die Originalnachricht
+            if (fromDate === "Unbekannt" || toDate === "Unbekannt" || reason === "Kein Grund angegeben") {
+                console.warn(`❌ Fehlerhafte LOA-Nachricht:\n${content}`);
+                continue; // Nachricht überspringen, wenn Daten fehlen
+            }
+
+            // LOA in SQLite speichern
+            db.run(
+                `INSERT INTO loa (user_id, username, from_date, to_date, reason, timestamp) VALUES (?, ?, ?, ?, ?, ?)`,
+                [userId, username, fromDate, toDate, reason, timestamp],
+                (err) => {
+                    if (err) {
+                        console.error(`❌ Fehler beim Speichern der LOA-Nachricht von ${userId}:`, err);
+                    } else {
+                        savedCount++;
+                    }
+                }
+            );
         }
 
-        message.reply("✅ Alle alten LOA wurden gespeichert!");
+        message.reply(`✅ Fertig! ${savedCount} alte LOA-Nachrichten wurden gespeichert.`);
     }
 };

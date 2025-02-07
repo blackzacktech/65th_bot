@@ -5,6 +5,7 @@ const path = require('path');
 const fetch = require('node-fetch');
 const expressLayouts = require('express-ejs-layouts');
 require('dotenv').config();
+const moment = require('moment');
 
 const app = express();
 const port = process.env.WEB_PORT || 3055;
@@ -83,23 +84,45 @@ app.get('/wiki', (req, res) => {
     res.render('wiki', { title: "Home" });
 });
 
-
 //? 📌 LOA-Abmeldungen anzeigen
 //? 🔗 /loa
 app.get('/loa', (req, res) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = moment().format("YYYY-MM-DD"); // Heutiges Datum im sicheren Format
 
     db.all(
-        `SELECT username, from_date, to_date, reason FROM loa WHERE to_date >= DATE(?) ORDER BY to_date ASC`,
+        `SELECT username, from_date, to_date, reason 
+         FROM loa 
+         WHERE to_date >= DATE(?) 
+         ORDER BY to_date ASC`,
         [today],
         (err, loaData) => {
             if (err) {
                 return res.status(500).send("❌ Fehler beim Laden der Abmeldungen.");
             }
-            res.render('loa', { title: "Aktuelle Abmeldungen", loaData });
+
+            // 🔄 **Datenbereinigung für Anzeige**
+            const cleanLoaData = loaData
+                .map(loa => {
+                    let fromDate = moment(loa.from_date, ["DD.MM.YYYY", "YYYY-MM-DD"], true);
+                    let toDate = moment(loa.to_date, ["DD.MM.YYYY", "YYYY-MM-DD"], true);
+
+                    return {
+                        username: loa.username || "Unbekannt",
+                        from_date: fromDate.isValid() ? fromDate.format("DD.MM.YYYY") : "Unbekannt",
+                        to_date: toDate.isValid() ? toDate.format("DD.MM.YYYY") : "Unbekannt",
+                        reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben"
+                    };
+                })
+                .filter(loa => loa.to_date !== "Unbekannt" && moment(loa.to_date, "DD.MM.YYYY").isSameOrAfter(moment())); // ❗ Nur aktive LOAs behalten
+
+            res.render('loa', { 
+                title: "Aktuelle Abmeldungen", 
+                loaData: cleanLoaData.length > 0 ? cleanLoaData : [] // ✅ Falls leer, bleibt die Seite nicht leer
+            });
         }
     );
 });
+
 
 //? 📌 Einweisungen anzeigen
 //? 🔗 /instructions
@@ -236,7 +259,6 @@ app.get('/:discordUserId/info', async (req, res) => {
 app.get('/:discordUserId/loa', (req, res) => {
     const { discordUserId } = req.params;
 
-    // Zuerst den Soldaten Namen abrufen
     db.get(
         `SELECT "Soldaten Name" FROM main_server_users WHERE user_id = ?`,
         [discordUserId],
@@ -246,26 +268,38 @@ app.get('/:discordUserId/loa', (req, res) => {
                 return res.status(500).send("❌ Fehler beim Laden der Nutzerdaten.");
             }
 
-            let ctNumber = discordUserId; // Standard: Discord-ID, falls keine CT-Nummer gefunden wird
+            let ctNumber = discordUserId;
             if (userData && userData["Soldaten Name"]) {
-                // Versuche die CT-Nummer aus dem Soldaten Namen zu extrahieren
                 const ctMatch = userData["Soldaten Name"].match(/(CT|CC|AT)-\d+/i);
                 if (ctMatch) {
-                    ctNumber = ctMatch[0]; // Setze CT-Nummer, wenn gefunden
+                    ctNumber = ctMatch[0];
                 }
             }
 
-            // Dann die LOA-Daten abrufen
             db.all(
-                `SELECT from_date, to_date, reason FROM loa WHERE user_id = ? ORDER BY to_date DESC`,
+                `SELECT from_date, to_date, reason 
+                 FROM loa 
+                 WHERE user_id = ? 
+                 ORDER BY to_date DESC`,
                 [discordUserId],
                 (err, loaData) => {
                     if (err) return res.status(500).send("❌ Fehler beim Laden der LOA-Daten.");
 
-                    res.render('userLoa', {
-                        title: `LOA Übersicht von ${ctNumber}`, // 🔥 Jetzt mit CT-Nummer!
-                        loaData,
-                        ctNumber
+                    const cleanLoaData = loaData.map(loa => {
+                        let fromDate = moment(loa.from_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true);
+                        let toDate = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true);
+
+                        return {
+                            from_date: fromDate.isValid() ? fromDate.format("DD.MM.YYYY") : "Unbekannt",
+                            to_date: toDate.isValid() ? toDate.format("DD.MM.YYYY") : "Unbekannt",
+                            reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben"
+                        };
+                    });
+
+                    res.render('userLoa', { 
+                        title: `LOA Übersicht von ${ctNumber}`,
+                        loaData: cleanLoaData, 
+                        ctNumber 
                     });
                 }
             );

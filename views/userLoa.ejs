@@ -6,16 +6,15 @@
     <% } else { %>
         <ul class="stat-list">
             <% loaData.forEach(loa => { 
-                let isActive = new Date(loa.to_date) >= new Date(); // 🔥 Prüft, ob Abmeldung aktiv ist
-                let statusClass = isActive ? "active-loa" : "inactive-loa"; // 🟡 Gelb für aktive, 🔴 Rot für inaktive
+                let isActive = loa.to_date !== "Unbekannt" && new Date(loa.to_date.split('.').reverse().join('-')) >= new Date();
+                let statusClass = isActive ? "active-loa" : "inactive-loa";
             %>
                 <li class="<%= statusClass %>">
-                    📅 <b>Von:</b> <%= new Date(loa.from_date).toLocaleDateString("de-DE") %> <br>
-                    📅 <b>Bis:</b> <%= new Date(loa.to_date).toLocaleDateString("de-DE") %> <br>
+                    📅 <b>Von:</b> <%= loa.from_date %> <br>
+                    📅 <b>Bis:</b> <%= loa.to_date %> <br>
                     📝 <b>Grund:</b> <%= loa.reason %> <br>
                 </li>
             <% }); %>
         </ul>
-        
     <% } %>
 </div>
