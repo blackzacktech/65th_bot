@@ -6,8 +6,7 @@
     <% } else { %>
         <ul class="stat-list">
             <% loaData.forEach(loa => { 
-                let isActive = loa.to_date !== "Unbekannt" && new Date(loa.to_date.split('.').reverse().join('-')) >= new Date();
-                let statusClass = isActive ? "active-loa" : "inactive-loa";
+                let statusClass = loa.isActive ? "active-loa" : "inactive-loa";
             %>
                 <li class="<%= statusClass %>">
                     📅 <b>Von:</b> <%= loa.from_date %> <br>

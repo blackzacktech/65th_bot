@@ -87,7 +87,7 @@ app.get('/wiki', (req, res) => {
 //? 📌 LOA-Abmeldungen anzeigen
 //? 🔗 /loa
 app.get('/loa', (req, res) => {
-    const today = moment().format("YYYY-MM-DD"); // Heutiges Datum im sicheren Format
+    const today = moment().format("YYYY-MM-DD"); // Sicheres Format für Vergleich
 
     db.all(
         `SELECT username, from_date, to_date, reason 
@@ -103,21 +103,24 @@ app.get('/loa', (req, res) => {
             // 🔄 **Datenbereinigung für Anzeige**
             const cleanLoaData = loaData
                 .map(loa => {
-                    let fromDate = moment(loa.from_date, ["DD.MM.YYYY", "YYYY-MM-DD"], true);
-                    let toDate = moment(loa.to_date, ["DD.MM.YYYY", "YYYY-MM-DD"], true);
+                    let fromDate = moment(loa.from_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+                    let toDate = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+
+                    // ✅ **Heute ist aktiv**
+                    let isActive = moment(toDate, "DD.MM.YYYY").isSameOrAfter(today, 'day');
 
                     return {
                         username: loa.username || "Unbekannt",
-                        from_date: fromDate.isValid() ? fromDate.format("DD.MM.YYYY") : "Unbekannt",
-                        to_date: toDate.isValid() ? toDate.format("DD.MM.YYYY") : "Unbekannt",
-                        reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben"
+                        from_date: fromDate || "Unbekannt",
+                        to_date: toDate || "Unbekannt",
+                        reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben",
+                        isActive
                     };
-                })
-                .filter(loa => loa.to_date !== "Unbekannt" && moment(loa.to_date, "DD.MM.YYYY").isSameOrAfter(moment())); // ❗ Nur aktive LOAs behalten
+                });
 
             res.render('loa', { 
                 title: "Aktuelle Abmeldungen", 
-                loaData: cleanLoaData.length > 0 ? cleanLoaData : [] // ✅ Falls leer, bleibt die Seite nicht leer
+                loaData: cleanLoaData.filter(loa => loa.isActive) // ✅ Nur aktive LOAs behalten
             });
         }
     );
@@ -312,14 +315,20 @@ app.get('/:discordUserId/loa', (req, res) => {
                 (err, loaData) => {
                     if (err) return res.status(500).send("❌ Fehler beim Laden der LOA-Daten.");
 
+                    const today = moment().format("YYYY-MM-DD");
+
+                    // **Füge `isActive` direkt im Backend hinzu, damit EJS das nicht berechnen muss**
                     const cleanLoaData = loaData.map(loa => {
-                        let fromDate = moment(loa.from_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true);
-                        let toDate = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true);
+                        let fromDate = moment(loa.from_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+                        let toDate = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+
+                        let isActive = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).isSameOrAfter(today, 'day');
 
                         return {
-                            from_date: fromDate.isValid() ? fromDate.format("DD.MM.YYYY") : "Unbekannt",
-                            to_date: toDate.isValid() ? toDate.format("DD.MM.YYYY") : "Unbekannt",
-                            reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben"
+                            from_date: fromDate || "Unbekannt",
+                            to_date: toDate || "Unbekannt",
+                            reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben",
+                            isActive
                         };
                     });
 

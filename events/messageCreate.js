@@ -85,8 +85,8 @@ Text Inhalt: ${message.content}
         // ✅ **Broadcast-System für den Hauptserver**
         const MAIN_SERVER_ID = process.env.MAIN_SERVER_ID;
         const MAIN_CHANNEL_ID = process.env.MAIN_CHANNEL_ID;
-
-        if (message.guild && message.guild.id === MAIN_SERVER_ID && message.channel.id === MAIN_CHANNEL_ID) {
+//&& message.guild.id === MAIN_SERVER_ID
+        if (message.guild && message.channel.id === MAIN_CHANNEL_ID) {
             console.log(`📢 Nachricht wird an Partner-Server gesendet: ${message.content}`);
 
             if (message.attachments.size > 0) {

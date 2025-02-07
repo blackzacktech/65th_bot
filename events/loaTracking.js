@@ -17,21 +17,24 @@ module.exports = {
         if (message.content.includes('Abmeldung [LOA -leave of absence-]')) {
             let content = message.content;
 
-            // 🛠 **Robuste Datumserkennung (Ab Wann & Bis Wann)**
-            const dateRegex = /\*\*Ab Wann:\*\*[\s]*(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{4})[\s\S]*?\*\*Bis Wann:\*\*[\s]*(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{4})/i;
-            const singleDateRegex = /\*\*Ab Wann:\*\*[\s]*(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{4})/i;
+            // 🔄 **Markdown & Leerzeichen fixen**
+            content = content.replace(/\*/g, "").replace(/_/g, "").trim();
+
+            // 🛠 **Erweiterte Datumserkennung**
+            const dateRegex = /(?:Ab Wann:\s*([\d]{1,2}[.\-\/][\d]{1,2}[.\-\/][\d]{4}))[\s\S]*?(?:Bis Wann:\s*([\d]{1,2}[.\-\/][\d]{1,2}[.\-\/][\d]{4}))/i;
+            const singleDateRegex = /Ab Wann:\s*([\d]{1,2}[.\-\/][\d]{1,2}[.\-\/][\d]{4})/i;
 
             let fromDate = "Unbekannt";
             let toDate = "Unbekannt";
 
             let match = content.match(dateRegex);
             if (match) {
-                fromDate = match[1];
-                toDate = match[2];
+                fromDate = match[1].trim();
+                toDate = match[2].trim();
             } else {
                 let singleMatch = content.match(singleDateRegex);
                 if (singleMatch) {
-                    fromDate = toDate = singleMatch[1];
+                    fromDate = toDate = singleMatch[1].trim();
                 }
             }
 
@@ -48,8 +51,8 @@ module.exports = {
             const userMatch = content.match(/Wer:\s*<@!?(\d+)>/);
             const userId = userMatch ? userMatch[1] : "Unbekannt";
 
-            // 🔍 **Grund extrahieren**
-            let reasonMatch = content.match(/(?:Ausführlicher Grund für die Abmeldung:|Grund:)\s*(.+)/i);
+            // 🔍 **Grund extrahieren (auch wenn "Grund" nicht explizit gesetzt wurde)**
+            let reasonMatch = content.match(/(?:Grund:|Ausführlicher Grund für die Abmeldung:)\s*(.+)/i);
             let reason = reasonMatch ? reasonMatch[1].trim() : "Kein Grund angegeben";
 
             // Falls der Grund zu kurz ist, wird er ignoriert
@@ -64,19 +67,19 @@ module.exports = {
                     username = user ? user.user.username : "Unbekannt";
                 } catch (err) {
                     console.error(`❌ Fehler beim Abrufen des Benutzernamens für ${userId}:`, err);
-                    return;
                 }
             }
 
+            // 📌 **Debugging: Zeigt alle erkannten Daten an**
             console.log(`📌 LOA erfasst:`);
             console.log(`   👤 User: ${username} (${userId})`);
             console.log(`   📅 Von: ${fromDate}`);
             console.log(`   📅 Bis: ${toDate}`);
             console.log(`   📝 Grund: ${reason}`);
 
-            // Falls das Datum ungültig ist, logge die Originalnachricht für Debugging
+            // 🛠 **Erkenne & korrigiere fehlerhafte Einträge**
             if (fromDate === "Unbekannt" || toDate === "Unbekannt") {
-                console.warn(`❌ Fehlerhafte Datumserkennung! Ursprüngliche Nachricht:\n${content}`);
+                console.warn(`❌ Fehlerhafte LOA-Nachricht:\n${content}`);
                 return;
             }
 
