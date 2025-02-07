@@ -14,7 +14,7 @@ app.use(express.json());
 
 //!---------------------------------------------------------------------------------------------------
 
-//Verbindung zur Datenbank
+//? 📌 Verbindung zur Datenbank
 const db = new sqlite3.Database('./utils/database/database.sqlite', (err) => {
     if (err) {
         console.error('❌ Fehler beim Öffnen der Datenbank', err);
@@ -25,16 +25,16 @@ const db = new sqlite3.Database('./utils/database/database.sqlite', (err) => {
 
 //!---------------------------------------------------------------------------------------------------
 
-// **EJS als Template-Engine nutzen**
+//? 📌 EJS als Template-Engine nutzen
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 //!---------------------------------------------------------------------------------------------------
 
-//? 📌 Webseite mit Statistiken anzeigen**
+//? 📌 Webseite mit Statistiken anzeigen
+//? 🔗 /
 app.get('/', (req, res) => {
     // 🟢 1. Server-Statistiken abrufen
     db.get(`
@@ -67,6 +67,8 @@ app.get('/', (req, res) => {
     });
 });
 
+//? 📌 Venator Base-Daten anzeigen
+//? 🔗 /venator
 app.get('/venator', (req, res) => {
     db.get(`SELECT * FROM Venator ORDER BY updated_at DESC LIMIT 1`, [], (err, venatorData) => {
         if (err) return res.status(500).send("❌ Fehler beim Laden der Venator Base-Daten.");
@@ -75,11 +77,15 @@ app.get('/venator', (req, res) => {
     });
 });
 
+//? 📌 Wiki anzeigen
+//? 🔗 /wiki
 app.get('/wiki', (req, res) => {
     res.render('wiki', { title: "Home" });
 });
 
-// 📌 Route für LOA-Abmeldungen (nur die aktuellen für heute)
+
+//? 📌 LOA-Abmeldungen anzeigen
+//? 🔗 /loa
 app.get('/loa', (req, res) => {
     const today = new Date().toISOString().split('T')[0];
 
@@ -95,7 +101,8 @@ app.get('/loa', (req, res) => {
     );
 });
 
-// 📌 Route für Einweisungen
+//? 📌 Einweisungen anzeigen
+//? 🔗 /instructions
 app.get('/instructions', (req, res) => {
     db.all(
         `SELECT trainee_user_id, trainee_username, vrc_name, instructor_username, ct_number, timestamp 
@@ -112,7 +119,8 @@ app.get('/instructions', (req, res) => {
     );
 });
 
-// 📌 Alle Server anzeigen, in denen der Bot ist
+//? 📌 Alle Server anzeigen, in denen der Bot ist*
+//? 🔗 /bot-servers
 app.get('/bot-servers', (req, res) => {
     db.all(`SELECT * FROM bot_servers`, [], (err, servers) => {
         if (err) return res.status(500).json({ error: "Fehler beim Abrufen der Server." });
@@ -123,7 +131,8 @@ app.get('/bot-servers', (req, res) => {
 
 //!---------------------------------------------------------------------------------------------------User infos
 
-// 📌 Automatische Weiterleitung von `/discordUserId` zu `/discordUserId/info`
+//? 📌 Automatische Weiterleitung von `/discordUserId` zu `/discordUserId/info`
+//? 🔗 /:discordUserId
 app.get('/:discordUserId', (req, res, next) => {
     const { discordUserId } = req.params;
 
@@ -136,7 +145,8 @@ app.get('/:discordUserId', (req, res, next) => {
     next();
 });
 
-// **Benutzerprofil anzeigen**
+//? 📌 Benutzerprofil anzeigen
+//? 🔗 /:discordUserId/info
 app.get('/:discordUserId/info', async (req, res) => {
     const { discordUserId } = req.params;
 
@@ -153,38 +163,62 @@ app.get('/:discordUserId/info', async (req, res) => {
         const roles = member.roles.cache.map(role => role.name).join(', ') || "Keine Rollen";
         const joinedAt = member.joinedAt ? member.joinedAt.toISOString().split('T')[0] : "Unbekannt";
 
+        // 🏅 CT-Nummer abrufen
         db.get(
-            `SELECT messages_sent, voice_minutes, activity_points FROM main_server_users WHERE user_id = ?`,
+            `SELECT "Soldaten Name" FROM main_server_users WHERE user_id = ?`,
             [discordUserId],
-            (err, activityData) => {
-                if (err) return res.status(500).send("❌ Fehler beim Laden der Nutzerdaten.");
+            (err, userData) => {
+                if (err) {
+                    console.error("❌ Fehler beim Abrufen des Soldaten Namens:", err);
+                    return res.status(500).send("❌ Fehler beim Laden der Nutzerdaten.");
+                }
 
+                let ctNumber = discordUserId; // Standard: Discord-ID, falls keine CT-Nummer gefunden wird
+                if (userData && userData["Soldaten Name"]) {
+                    // Versuche die CT-Nummer aus dem Soldaten Namen zu extrahieren
+                    const ctMatch = userData["Soldaten Name"].match(/(CT|CC|AT)-\d+/i);
+                    if (ctMatch) {
+                        ctNumber = ctMatch[0]; // Setze CT-Nummer, wenn gefunden
+                    }
+                }
+
+                // 📊 Aktivitätsdaten abrufen
                 db.get(
-                    `SELECT COUNT(*) AS loa_count FROM loa WHERE user_id = ?`,
+                    `SELECT messages_sent, voice_minutes, activity_points FROM main_server_users WHERE user_id = ?`,
                     [discordUserId],
-                    (err, loaData) => {
-                        if (err) return res.status(500).send("❌ Fehler beim Laden der LOA-Daten.");
+                    (err, activityData) => {
+                        if (err) return res.status(500).send("❌ Fehler beim Laden der Nutzerdaten.");
 
-                        // 🔹 Anzahl der Einweisungen abrufen:
+                        // 📌 Anzahl der LOA-Anträge abrufen
                         db.get(
-                            `SELECT COUNT(*) AS instruction_count FROM instructions WHERE instructor_user_id = ?`,
+                            `SELECT COUNT(*) AS loa_count FROM loa WHERE user_id = ?`,
                             [discordUserId],
-                            (err, instructionData) => {
-                                if (err) return res.status(500).send("❌ Fehler beim Laden der Einweisungen.");
+                            (err, loaData) => {
+                                if (err) return res.status(500).send("❌ Fehler beim Laden der LOA-Daten.");
 
-                                res.render('userProfile', {
-                                    title: `Profil von ${username}`,
-                                    username,
-                                    avatarURL,
-                                    roles,
-                                    joinedAt,
-                                    messagesSent: activityData?.messages_sent || 0,
-                                    voiceMinutes: activityData?.voice_minutes || 0,
-                                    activityPoints: activityData?.activity_points || 0,
-                                    loaCount: loaData?.loa_count || 0,
-                                    instructionCount: instructionData?.instruction_count || 0, // ✅ Anzahl der Einweisungen
-                                    userId: discordUserId
-                                });
+                                // 🔹 Anzahl der Einweisungen abrufen:
+                                db.get(
+                                    `SELECT COUNT(*) AS instruction_count FROM instructions WHERE instructor_user_id = ?`,
+                                    [discordUserId],
+                                    (err, instructionData) => {
+                                        if (err) return res.status(500).send("❌ Fehler beim Laden der Einweisungen.");
+
+                                        res.render('userProfile', {
+                                            title: `Profil von ${ctNumber}`,
+                                            username,
+                                            avatarURL,
+                                            roles,
+                                            joinedAt,
+                                            messagesSent: activityData?.messages_sent || 0,
+                                            voiceMinutes: activityData?.voice_minutes || 0,
+                                            activityPoints: activityData?.activity_points || 0,
+                                            loaCount: loaData?.loa_count || 0,
+                                            instructionCount: instructionData?.instruction_count || 0,
+                                            userId: discordUserId,
+                                            ctNumber // ✅ CT-Nummer wird an das Template übergeben
+                                        });
+                                    }
+                                );
                             }
                         );
                     }
@@ -197,7 +231,8 @@ app.get('/:discordUserId/info', async (req, res) => {
     }
 });
 
-// **LOA-Abmeldungen eines bestimmten Benutzers abrufen**
+//? 📌 LOA-Abmeldungen eines bestimmten Benutzers abrufen
+//? 🔗 /:discordUserId/loa
 app.get('/:discordUserId/loa', (req, res) => {
     const { discordUserId } = req.params;
 
@@ -214,7 +249,7 @@ app.get('/:discordUserId/loa', (req, res) => {
             let ctNumber = discordUserId; // Standard: Discord-ID, falls keine CT-Nummer gefunden wird
             if (userData && userData["Soldaten Name"]) {
                 // Versuche die CT-Nummer aus dem Soldaten Namen zu extrahieren
-                const ctMatch = userData["Soldaten Name"].match(/CT-\d+/i);
+                const ctMatch = userData["Soldaten Name"].match(/(CT|CC|AT)-\d+/i);
                 if (ctMatch) {
                     ctNumber = ctMatch[0]; // Setze CT-Nummer, wenn gefunden
                 }
@@ -238,8 +273,8 @@ app.get('/:discordUserId/loa', (req, res) => {
     );
 });
 
-
-// **Einweisungen einer bestimmten Benutzers abrufen**
+//? 📌 Einweisungen einer bestimmten Benutzers abrufen
+//? 🔗 /:discordUserId/instructions
 app.get('/:discordUserId/instructions', (req, res) => {
     const { discordUserId } = req.params;
 
@@ -256,7 +291,7 @@ app.get('/:discordUserId/instructions', (req, res) => {
             let ctNumber = discordUserId; // Standard: Discord-ID, falls keine CT-Nummer gefunden wird
             if (userData && userData["Soldaten Name"]) {
                 // Versuche die CT-Nummer aus dem Soldaten Namen zu extrahieren
-                const ctMatch = userData["Soldaten Name"].match(/CT-\d+/i);
+                const ctMatch = userData["Soldaten Name"].match(/(CT|CC|AT)-\d+/i);
                 if (ctMatch) {
                     ctNumber = ctMatch[0]; // Setze CT-Nummer, wenn gefunden
                 }
@@ -286,10 +321,10 @@ app.get('/:discordUserId/instructions', (req, res) => {
     );
 });
 
-
 //!---------------------------------------------------------------------------------------------------📌 API-Endpunkte für externe oder interne Nutzung
 
-// 📌 Route für alle Benutzer in einer übersichtlichen Tabelle
+//?📌 Route für alle Benutzer in einer übersichtlichen Tabelle
+//? 🔗 /user
 app.get('/user', (req, res) => {
     const searchTerm = req.query.search || ''; // Suchbegriff aus den Query-Parametern abrufen
 
@@ -307,7 +342,8 @@ app.get('/user', (req, res) => {
     });
 });
 
-// ✅ Einzelne Benutzerinformationen abrufen
+//? 📌 Einzelne Benutzerinformationen abrufen
+//? 🔗 /main-server-users/:id
 app.get('/main-server-users/:id', (req, res) => {
     const userId = req.params.id;
     db.get('SELECT * FROM main_server_users WHERE user_id = ?', [userId], (err, row) => {
@@ -317,7 +353,8 @@ app.get('/main-server-users/:id', (req, res) => {
     });
 });
 
-// ✅ Partner-Server abrufen
+//? 📌 Partner-Server abrufen
+//? 🔗 /partner-servers
 app.get('/partner-servers', (req, res) => {
     db.all('SELECT * FROM partner_servers', [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -325,7 +362,8 @@ app.get('/partner-servers', (req, res) => {
     });
 });
 
-// ✅ Partner-Benutzer abrufen
+//? 📌 Partner-Benutzer abrufen
+//? 🔗 /partners
 app.get('/partners', (req, res) => {
     db.all('SELECT * FROM partners', [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -333,7 +371,8 @@ app.get('/partners', (req, res) => {
     });
 });
 
-// ✅ Punkte eines Benutzers aktualisieren
+//? 📌 Punkte eines Benutzers aktualisieren
+//? 🔗 /update-score
 app.post('/update-score', (req, res) => {
     const { user_id, points } = req.body;
     if (!user_id || points === undefined) {
@@ -350,7 +389,8 @@ app.post('/update-score', (req, res) => {
     );
 });
 
-
+//? 📌 Venator-Bild abrufen
+//? 🔗 /venator-image
 app.get('/venator-image', async (req, res) => {
     try {
         const WORLD_ID = 'wrld_23784c95-eb2a-4067-a355-31958bb85141';
@@ -402,19 +442,21 @@ app.get('/venator-image', async (req, res) => {
 
 //!---------------------------------------------------------------------------------------------------Invites
 
-// 📌 Weiterleitung zum Bot-Invite-Link
+//? 📌 Weiterleitung zum Bot-Invite-Link ---- /invite-bot
+//? 🔗 /
 app.get('/invite-bot', (req, res) => {
     res.redirect('https://discord.com/oauth2/authorize?client_id=1333895828175065119');
 });
 
-// 📌 Weiterleitung zum Haupt-Discord-Server
+//? 📌 Weiterleitung zum Haupt-Discord-Server ---- /invite-server
+//? 🔗 /
 app.get('/invite-server', (req, res) => {
     res.redirect('https://discord.com/invite/AeeTSBwXGP');
 });
 
 //!---------------------------------------------------------------------------------------------------Invites
 
-// **Server starten**
+//? 📌 Server starten
 app.listen(port, () => {
     console.log(`🚀 Webserver läuft auf http://localhost:${port} / https://65thofvr.chat`);
 });

@@ -27,7 +27,14 @@ module.exports = {
                      ON CONFLICT(user_id) DO UPDATE
                      SET voice_minutes = main_server_users.voice_minutes + ?,  
                          activity_points = main_server_users.activity_points + ?`,
-                    [userId, username, duration, duration * 2, duration, duration * 2]
+                    [userId, username, duration, duration * 2, duration, duration * 2],
+                    function(err) {
+                        if (err) {
+                            console.error('❌ Fehler beim Speichern der Voice-Minuten:', err);
+                        } else {
+                            console.log(`✅ Voice-Minuten für ${username} aktualisiert: ${duration} Minuten.`);
+                        }
+                    }
                 );
             }
         }
