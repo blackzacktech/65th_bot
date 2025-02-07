@@ -1,14 +1,24 @@
 <h1 class="glow-text">👤 Profil von <%= ctNumber %></h1>
 
-<!-- Profilbild -->
+<!-- Profilbild + Soldatenname -->
 <div class="container image-container">
     <img src="<%= avatarURL %>" alt="Profilbild von <%= ctNumber %>" class="profile-image">
+    <h2 class="soldier-name"><%= soldierName %></h2> <!-- Soldatenname -->
+    <p class="discord-name">@<%= username %></p> <!-- Discord-Name -->
+    <h3>📅 Beigetreten am: <span class="highlight"><%= joinedAt %></span></h3>
 </div>
 
-<!-- Benutzerinfos -->
-<div class="container">
-    <h2>🛡️ Rollen: <span class="highlight"><%= roles %></span></h2>
-    <h3>📅 Beigetreten am: <span class="highlight"><%= joinedAt %></span></h3>
+<!-- Militärische Informationen -->
+<div class="container military-info">
+    <h3>🛡️ <span class="highlight">Dienstgrad & Zugehörigkeit</span></h3>
+    <ul class="stat-list">
+        <li><b>🛠 Ebene:</b> <%= militaryLevel %></li>
+        <li><b>🎖 Rang:</b> <%= militaryRank %></li>
+        <hr>
+        <li><b>🏅 Medaillen:</b> <%= medals %></li>
+        <hr>
+        <li><b>⚔️ Klasse:</b> <%= classType %></li>
+    </ul>
 </div>
 
 <!-- Server-Aktivität -->
@@ -27,7 +37,7 @@
     <p>📝 Anzahl: <a href="/<%= userId %>/loa"><b><%= loaCount %></b></a></p>
 </div>
 
-<!-- 🔹 Einweisungsübersicht (NEU) -->
+<!-- 🔹 Einweisungsübersicht -->
 <div class="container">
     <h3>📜 <span class="highlight">Einweisungen</span></h3>
     <p>📌 Anzahl: <a href="/<%= userId %>/instructions"><b><%= instructionCount %></b></a></p>

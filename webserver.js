@@ -183,43 +183,64 @@ app.get('/:discordUserId/info', async (req, res) => {
 
         const username = member.user.username;
         const avatarURL = member.user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 });
-        const roles = member.roles.cache.map(role => role.name).join(', ') || "Keine Rollen";
-        const joinedAt = member.joinedAt ? member.joinedAt.toISOString().split('T')[0] : "Unbekannt";
+        const joinedAt = member.joinedAt ? moment(member.joinedAt).format("DD.MM.YYYY") : "Unbekannt";
 
-        // 🏅 CT-Nummer abrufen
+        // **Soldatenname & CT-Nummer abrufen**
+        let ctNumber = discordUserId; // Standardmäßig die Discord-ID als Fallback
+        let soldierName = "Unbekannt";
+
         db.get(
             `SELECT "Soldaten Name" FROM main_server_users WHERE user_id = ?`,
             [discordUserId],
             (err, userData) => {
-                if (err) {
-                    console.error("❌ Fehler beim Abrufen des Soldaten Namens:", err);
-                    return res.status(500).send("❌ Fehler beim Laden der Nutzerdaten.");
-                }
+                if (!err && userData && userData["Soldaten Name"]) {
+                    soldierName = userData["Soldaten Name"];
 
-                let ctNumber = discordUserId; // Standard: Discord-ID, falls keine CT-Nummer gefunden wird
-                if (userData && userData["Soldaten Name"]) {
-                    // Versuche die CT-Nummer aus dem Soldaten Namen zu extrahieren
-                    const ctMatch = userData["Soldaten Name"].match(/(CT|CC|AT)-\d+/i);
+                    // **CT-Nummer aus dem Namen extrahieren**
+                    const ctMatch = soldierName.match(/(CT|CC|AT)-\d+/i);
                     if (ctMatch) {
-                        ctNumber = ctMatch[0]; // Setze CT-Nummer, wenn gefunden
+                        ctNumber = ctMatch[0]; // Setze CT-Nummer, falls gefunden
                     }
                 }
 
-                // 📊 Aktivitätsdaten abrufen
+                // **Rollen analysieren**
+                const roles = member.roles.cache.map(role => role.name);
+
+                // 🔹 **Rang & Ebene erkennen**
+                const rankRegex = /\b(C-CPL|CPL|L-CPL|PVT-1st|PVT|TRP|SGT-MAJ|SGT|LT|2nd-LT|MAJ|MAJ-L|CPT|CDR|S-CDR|\*C\*-CDR)\b/;
+                const levelRegex = /\b(Commanders|Commanding Officers|Coruscant Guard Officers)\b/;
+
+                const militaryRank = roles.find(role => rankRegex.test(role)) || "Kein Rang";
+                const militaryLevel = roles.find(role => levelRegex.test(role)) || "Keine Ebene";
+
+                // 🔹 **Medaillen extrahieren**
+                const medals = roles.filter(role => role.includes("Medaille")).join(', ') || "Keine Medaillen";
+
+                // 🔹 **Alle gefundenen Klassen extrahieren**
+                const classKeywords = [
+                    "Senats Gardist", "Arc Trooper", "Riot Force", "Shock Trooper", "Massiv-Führere",
+                    "Engineering Comany", "Hound Staffel", "Barc", "Advanced Recon Force",
+                    "Non Commissioned Officer", "Marksman", "Heavy Trooper", "Medic Trooper"
+                ];
+
+                const classRoles = roles.filter(role => classKeywords.some(keyword => role.includes(keyword)));
+                const classType = classRoles.length > 0 ? classRoles.join(', ') : "Keine Klasse";
+
+                // 🔹 **Server-Interaktionswerte abrufen**
                 db.get(
                     `SELECT messages_sent, voice_minutes, activity_points FROM main_server_users WHERE user_id = ?`,
                     [discordUserId],
                     (err, activityData) => {
                         if (err) return res.status(500).send("❌ Fehler beim Laden der Nutzerdaten.");
 
-                        // 📌 Anzahl der LOA-Anträge abrufen
+                        // 🔹 **LOA-Anzahl abrufen**
                         db.get(
                             `SELECT COUNT(*) AS loa_count FROM loa WHERE user_id = ?`,
                             [discordUserId],
                             (err, loaData) => {
                                 if (err) return res.status(500).send("❌ Fehler beim Laden der LOA-Daten.");
 
-                                // 🔹 Anzahl der Einweisungen abrufen:
+                                // 🔹 **Einweisungen abrufen**
                                 db.get(
                                     `SELECT COUNT(*) AS instruction_count FROM instructions WHERE instructor_user_id = ?`,
                                     [discordUserId],
@@ -227,10 +248,9 @@ app.get('/:discordUserId/info', async (req, res) => {
                                         if (err) return res.status(500).send("❌ Fehler beim Laden der Einweisungen.");
 
                                         res.render('userProfile', {
-                                            title: `Profil von ${ctNumber}`,
+                                            title: `Profil von ${soldierName}`,
                                             username,
                                             avatarURL,
-                                            roles,
                                             joinedAt,
                                             messagesSent: activityData?.messages_sent || 0,
                                             voiceMinutes: activityData?.voice_minutes || 0,
@@ -238,7 +258,12 @@ app.get('/:discordUserId/info', async (req, res) => {
                                             loaCount: loaData?.loa_count || 0,
                                             instructionCount: instructionData?.instruction_count || 0,
                                             userId: discordUserId,
-                                            ctNumber // ✅ CT-Nummer wird an das Template übergeben
+                                            soldierName,
+                                            ctNumber,  // ✅ Fix: CT-Nummer wird jetzt korrekt übergeben
+                                            militaryRank,
+                                            militaryLevel,
+                                            medals,
+                                            classType  // ✅ Jetzt werden alle Klassen korrekt gesammelt!
                                         });
                                     }
                                 );
@@ -253,6 +278,8 @@ app.get('/:discordUserId/info', async (req, res) => {
         res.status(404).send("❌ Benutzer nicht gefunden.");
     }
 });
+
+
 
 //? 📌 LOA-Abmeldungen eines bestimmten Benutzers abrufen
 //? 🔗 /:discordUserId/loa
