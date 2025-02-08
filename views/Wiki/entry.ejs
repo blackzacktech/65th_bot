@@ -1,0 +1,23 @@
+<link rel="stylesheet" href="/wiki.css">
+
+<div class="wiki-header">
+    <h1 class="wiki-title">📜 <%= title %></h1> <!-- 🔥 Große Hauptüberschrift bleibt ganz oben -->
+</div>
+
+<!-- 🔙 Zurück-Button -->
+<a href="/wiki" class="back-button">🔙 Zurück zum Wiki</a>
+
+<div class="wiki-container">
+    <div class="wiki-content">
+        <%- content %> <!-- 🚀 HTML-Rendering für Markdown-Inhalt -->
+    </div>
+</div>
+
+<!-- 📜 Metadaten werden hier eingefügt -->
+<div class="wiki-metadata">
+    <p><strong>Autor:</strong> <%= metadata.author || "Unbekannt" %></p>
+    <p><strong>Erstellt am:</strong> <%= metadata.created || "Unbekannt" %></p>
+    <p><strong>Zuletzt bearbeitet:</strong> <%= metadata.last_modified || "Keine Änderungen" %></p>
+    <p><strong>Kategorie:</strong> <%= metadata.category || "Allgemein" %></p>
+    <p><strong>Tags:</strong> <%= metadata.tags ? metadata.tags.join(", ") : "Keine Tags" %></p>
+</div>

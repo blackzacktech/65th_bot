@@ -1,0 +1,183 @@
+/* 🌟 Wiki Hauptüberschrift */
+.wiki-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.wiki-title {
+    font-size: 2.8em;
+    color: #ffcc00;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 3px 3px 8px rgba(255, 204, 0, 0.9), 0 0 10px rgba(255, 255, 255, 0.5);
+    border-bottom: 4px solid rgba(255, 204, 0, 0.9);
+    padding-bottom: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+/* 🔙 Zurück-Button (fixiert unten links) */
+.back-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 1.2em;
+    color: #ffcc00;
+    text-decoration: none;
+    font-weight: bold;
+    background: rgba(20, 20, 20, 0.9);
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+}
+
+.back-button:hover {
+    text-shadow: 0 0 10px #ffcc00;
+    background: rgba(255, 0, 0, 0.8);
+}
+
+/* 📜 Wiki-Container */
+.wiki-container {
+    background: rgba(20, 20, 20, 0.96);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px auto;
+    width: 95%;
+    max-width: 900px;
+    box-shadow: 0px 0px 15px rgba(211, 47, 47, 0.6);
+    text-align: left;
+    border: 1px solid rgba(211, 47, 47, 0.4);
+}
+
+/* 📝 Wiki-Inhalt */
+.wiki-content {
+    font-size: 1.2em;
+    color: #e0e0e0;
+    line-height: 1.6;
+}
+
+.wiki-category {
+    margin-top: 30px;
+    padding: 15px;
+    background: rgba(20, 20, 20, 0.96);
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(211, 47, 47, 0.6);
+}
+
+.wiki-category h2 {
+    color: #ffcc00;
+    border-bottom: 2px solid #ffcc00;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.wiki-category ul {
+    list-style: none;
+    padding: 0;
+}
+
+.wiki-category li {
+    padding: 8px 0;
+    font-size: 1.2em;
+}
+
+.wiki-category a {
+    text-decoration: none;
+    color: #ffcc00;
+    transition: 0.3s;
+}
+
+.wiki-category a:hover {
+    text-shadow: 0 0 10px #ffcc00;
+}
+
+
+/* 🎨 Farbcodierung für Markdown */
+.color-goldorange {color: #ffa600; font-weight: bold;}
+.color-gold { color: #ffd700; font-weight: bold; }
+.color-blue { color: #0099ff; font-weight: bold; }
+.color-red { color: #ff4444; font-weight: bold; }
+
+
+/* 🏆 Markdown-Überschriften */
+.wiki-content h2 {
+    font-size: 1.8em;
+    color: #ff3333;
+    border-bottom: 2px solid #ffcc00;
+    padding-bottom: 5px;
+    margin-top: 20px;
+}
+
+.wiki-content h3 {
+    font-size: 1.5em;
+    color: #ffcc00;
+}
+
+/* 📖 Listen */
+.wiki-content ul {
+    padding-left: 20px;
+}
+
+.wiki-content li {
+    margin-bottom: 8px;
+}
+
+/* 🖼 Bilder */
+.wiki-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(211, 47, 47, 0.6);
+    display: block;
+    margin: 20px auto;
+}
+
+/* 🖇 Links */
+.wiki-content a {
+    color: #ffcc00;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.wiki-content a:hover {
+    text-shadow: 0 0 10px #ffcc00;
+}
+
+/* 🏆 Code-Blöcke */
+.wiki-content pre {
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+}
+
+/* 🏷 Wiki-Metadaten-Stil */
+.wiki-metadata {
+    background: rgba(20, 20, 20, 0.96);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 30px;
+    width: 95%;
+    max-width: 900px;
+    box-shadow: 0px 0px 10px rgba(211, 47, 47, 0.6);
+    text-align: center; /* ✅ Zentriert den Text */
+    font-size: 1em;
+    color: #e0e0e0;
+    margin: 40px auto 0 auto; /* ✅ Automatische Zentrierung */
+}
+
+/* 📜 Text-Styling */
+.wiki-metadata p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.wiki-metadata strong {
+    color: #ffcc00; /* ✅ Gold-Orange für Hervorhebung */
+}

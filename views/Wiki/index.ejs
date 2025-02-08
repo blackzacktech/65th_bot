@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="/wiki.css">
+
+<h1 class="glow-text">📜 Wiki</h1>
+
+<!-- 📜 Suchfeld -->
+<div class="search-container">
+    <form action="/wiki/search" method="get">
+        <input type="text" name="q" placeholder="🔍 Wiki durchsuchen..." value="<%= query || '' %>">
+        <button type="submit">🔎 Suchen</button>
+    </form>
+</div>
+
+<!-- 📂 Kategorien & Einträge -->
+<div class="wiki-container">
+    <% if (Object.keys(categories).length === 0) { %>
+        <p>❌ Keine Ergebnisse gefunden.</p>
+    <% } else { %>
+        <% Object.keys(categories).forEach(category => { %>
+            <div class="wiki-category">
+                <h2>📂 <%= category %></h2>
+                <ul>
+                    <% categories[category].forEach(entry => { %>
+                        <li><a href="<%= entry.link %>">📜 <%= entry.title %></a></li>
+                    <% }); %>
+                </ul>
+            </div>
+        <% }); %>
+    <% } %>
+</div>

@@ -2,13 +2,21 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const fetch = require('node-fetch');
 const expressLayouts = require('express-ejs-layouts');
+const yaml = require('js-yaml');
+const markdownIt = require('markdown-it');
 require('dotenv').config();
 const moment = require('moment');
+const marked = require('marked');
+const DOMPurify = require('isomorphic-dompurify'); // Schutz gegen XSS
+
 
 const app = express();
 const port = process.env.WEB_PORT || 3055;
+const wikiPath = path.join(__dirname, 'media/wiki'); // 📂 Pfad zu den Wiki-Dateien
+const md = new markdownIt(); // 📜 Markdown-Parser
 
 app.use(cors());
 app.use(express.json());
@@ -63,7 +71,7 @@ app.get('/', (req, res) => {
                 return res.status(500).send("Fehler beim Laden des Leaderboards.");
             }
 
-            res.render('index', { title: "Home", serverStats, leaderboard });
+            res.render('Structur/index', { title: "Home", serverStats, leaderboard });
         });
     });
 });
@@ -74,14 +82,8 @@ app.get('/venator', (req, res) => {
     db.get(`SELECT * FROM Venator ORDER BY updated_at DESC LIMIT 1`, [], (err, venatorData) => {
         if (err) return res.status(500).send("❌ Fehler beim Laden der Venator Base-Daten.");
 
-        res.render('venator', { title: "Venator", venatorData });
+        res.render('Bot/venator', { title: "Venator", venatorData });
     });
-});
-
-//? 📌 Wiki anzeigen
-//? 🔗 /wiki
-app.get('/wiki', (req, res) => {
-    res.render('wiki', { title: "Home" });
 });
 
 //? 📌 LOA-Abmeldungen anzeigen
@@ -118,14 +120,13 @@ app.get('/loa', (req, res) => {
                     };
                 });
 
-            res.render('loa', { 
+            res.render('Bot/loa', { 
                 title: "Aktuelle Abmeldungen", 
                 loaData: cleanLoaData.filter(loa => loa.isActive) // ✅ Nur aktive LOAs behalten
             });
         }
     );
 });
-
 
 //? 📌 Einweisungen anzeigen
 //? 🔗 /instructions
@@ -140,7 +141,7 @@ app.get('/instructions', (req, res) => {
                 console.error("❌ Fehler beim Abrufen der Einweisungen:", err);
                 return res.status(500).send("❌ Fehler beim Laden der Einweisungen.");
             }
-            res.render('instructions', { title: "Einweisungen", instructions });
+            res.render('Bot/instructions', { title: "Einweisungen", instructions });
         }
     );
 });
@@ -151,7 +152,7 @@ app.get('/bot-servers', (req, res) => {
     db.all(`SELECT * FROM bot_servers`, [], (err, servers) => {
         if (err) return res.status(500).json({ error: "Fehler beim Abrufen der Server." });
 
-        res.render('botServers', { title: "Bot-Server", servers });
+        res.render('Bot/botServers', { title: "Bot-Server", servers });
     });
 });
 
@@ -250,7 +251,7 @@ app.get('/:discordUserId/info', async (req, res) => {
                                     (err, instructionData) => {
                                         if (err) return res.status(500).send("❌ Fehler beim Laden der Einweisungen.");
 
-                                        res.render('userProfile', {
+                                        res.render('User/userProfile', {
                                             title: `Profil von ${soldierName}`,
                                             username,
                                             avatarURL,
@@ -281,8 +282,6 @@ app.get('/:discordUserId/info', async (req, res) => {
         res.status(404).send("❌ Benutzer nicht gefunden.");
     }
 });
-
-
 
 //? 📌 LOA-Abmeldungen eines bestimmten Benutzers abrufen
 //? 🔗 /:discordUserId/loa
@@ -332,7 +331,7 @@ app.get('/:discordUserId/loa', (req, res) => {
                         };
                     });
 
-                    res.render('userLoa', { 
+                    res.render('User/userLoa', { 
                         title: `LOA Übersicht von ${ctNumber}`,
                         loaData: cleanLoaData, 
                         ctNumber 
@@ -380,7 +379,7 @@ app.get('/:discordUserId/instructions', (req, res) => {
                         return res.status(500).send("❌ Fehler beim Laden der Einweisungen.");
                     }
 
-                    res.render('userInstructions', {
+                    res.render('User/userInstructions', {
                         title: `Einweisungen von ${ctNumber}`, // 🔥 Jetzt mit CT-Nummer!
                         instructions,
                         ctNumber
@@ -408,7 +407,7 @@ app.get('/user', (req, res) => {
             console.error("❌ Fehler beim Abrufen der Benutzer:", err);
             return res.status(500).send("Fehler beim Laden der Benutzerdaten.");
         }
-        res.render('users', { title: "Benutzerübersicht", users, searchTerm }); // Suchbegriff an die Ansicht übergeben
+        res.render('User/users', { title: "Benutzerübersicht", users, searchTerm }); // Suchbegriff an die Ansicht übergeben
     });
 });
 
@@ -509,6 +508,112 @@ app.get('/venator-image', async (req, res) => {
         res.status(500).json({ error: 'Fehler beim Laden des Bildes.' });
     }
 });
+
+//!---------------------------------------------------------------------------------------------------Wiki
+
+// 📌 🗂 WIKI: Liste aller Einträge abrufen
+app.get('/wiki', (req, res) => {
+    fs.readdir(wikiPath, { withFileTypes: true }, (err, items) => {
+        if (err) return res.status(500).send("❌ Fehler beim Laden der Wiki-Dateien.");
+
+        let categories = {};
+
+        items.forEach(item => {
+            if (item.isDirectory()) {
+                const categoryName = item.name; // Ordnername = Kategorie
+                const categoryPath = path.join(wikiPath, categoryName);
+
+                // 🟢 Alle `.md`-Dateien im Ordner abrufen
+                const files = fs.readdirSync(categoryPath)
+                    .filter(file => file.endsWith('.md'))
+                    .map(file => ({
+                        title: file.replace('.md', ''), // Entferne .md für den Titel
+                        link: `/wiki/${categoryName}/${file.replace('.md', '')}` // Erstelle den Link
+                    }));
+
+                if (files.length > 0) {
+                    categories[categoryName] = files;
+                }
+            }
+        });
+
+        res.render('Wiki/index', { title: "Wiki", categories, query: "" });
+    });
+});
+
+app.get('/wiki/:category/:entry', (req, res) => {
+    const categoryPath = path.join(wikiPath, req.params.category);
+    const entryFile = path.join(categoryPath, `${req.params.entry}.md`);
+
+    fs.readFile(entryFile, 'utf8', (err, content) => {
+        if (err) {
+            return res.status(404).send("❌ Dieser Wiki-Artikel existiert nicht.");
+        }
+
+        let metadata = {};
+        let markdownContent = content;
+
+        // 🔹 Extrahiere Metadaten, wenn das Dokument mit `---` beginnt
+        const match = content.match(/^---\n([\s\S]+?)\n---\n/);
+        if (match) {
+            try {
+                metadata = yaml.load(match[1]); // 📜 YAML-Parser für Metadaten
+            } catch (err) {
+                console.error("⚠️ Fehler beim Parsen der Metadaten:", err);
+            }
+            markdownContent = content.replace(match[0], ''); // Entferne den YAML-Header
+        }
+
+        // ✅ Markdown in HTML umwandeln & XSS-Schutz aktivieren
+        let htmlContent = marked.parse(markdownContent);
+        htmlContent = DOMPurify.sanitize(htmlContent);
+
+        // 🔹 Entferne die erste <h1>-Überschrift, falls sie existiert (um doppelte Titel zu vermeiden)
+        htmlContent = htmlContent.replace(/^<h1[^>]*>.*?<\/h1>/i, '');
+
+        res.render('Wiki/entry', { 
+            title: metadata.title || req.params.entry.replace(/-/g, ' '), 
+            content: htmlContent, 
+            metadata // 📜 Metadaten an EJS übergeben
+        });
+    });
+});
+
+// 📌 🔍 WIKI: Suchfunktion mit Kategorien
+app.get('/wiki/search', (req, res) => {
+    const query = req.query.q.toLowerCase();
+
+    let categories = {};
+
+    // 🔍 Durchsuche alle Kategorien (Ordner)
+    fs.readdir(wikiPath, { withFileTypes: true }, (err, categoryDirs) => {
+        if (err) return res.status(500).send("❌ Fehler beim Durchsuchen der Wiki-Dateien.");
+
+        categoryDirs.forEach(category => {
+            if (category.isDirectory()) {
+                const categoryName = category.name;
+                const categoryPath = path.join(wikiPath, categoryName);
+
+                // 🔍 Durchsuche alle `.md`-Dateien im Ordner
+                const files = fs.readdirSync(categoryPath)
+                    .filter(file => file.endsWith('.md'))
+                    .map(file => ({
+                        title: file.replace('.md', ''),
+                        link: `/wiki/${categoryName}/${file.replace('.md', '')}`
+                    }));
+
+                // 📜 Nur Treffer zur Kategorie hinzufügen
+                const filteredFiles = files.filter(entry => entry.title.toLowerCase().includes(query));
+                if (filteredFiles.length > 0) {
+                    categories[categoryName] = filteredFiles;
+                }
+            }
+        });
+
+        res.render('Wiki/index', { title: "Wiki Suche", categories, query });
+    });
+});
+
 
 //!---------------------------------------------------------------------------------------------------Invites
 
