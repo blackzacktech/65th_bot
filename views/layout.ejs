@@ -8,11 +8,12 @@
 </head>
 <body>
 
-    <!-- 🍔 Hamburger Menü Button -->
-    <div class="menu-icon" onclick="toggleMobileMenu()">☰</div>
-
-    <!-- 🔹 Navigation -->
+    <!-- 🔹 Navigation mit Logo -->
     <div class="navbar">
+        <div class="navbar-logo">
+            <img src="/images/logo.png" alt="65th Coruscant Guard">
+        </div>
+
         <div class="navbar-links">
             <a href="/">🏠 Home</a>
             <a href="/wiki">📜 Wiki</a>
@@ -21,6 +22,9 @@
             <a href="/loa">📅 Abmeldungen</a>
             <a href="/invite-server" target="_blank" class="discord-button">🎮 Discord</a>
         </div>
+
+        <!-- 🍔 Hamburger Menü Button für mobile Ansicht -->
+        <div class="menu-icon" onclick="toggleMobileMenu()">☰</div>
     </div>
 
     <!-- 📱 Mobiles Menü -->
@@ -42,11 +46,7 @@
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById("mobileMenu");
-            if (menu.style.display === "flex") {
-                menu.style.display = "none";
-            } else {
-                menu.style.display = "flex";
-            }
+            menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
         }
     </script>
 

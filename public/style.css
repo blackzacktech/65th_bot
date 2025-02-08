@@ -33,45 +33,52 @@ body {
     box-shadow: 0px 0px 25px rgba(255, 0, 0, 0.8);
 }
 
-/* 📜 Navigation */
+/* 🔹 Neue Navigation mit Logo */
 .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: rgba(20, 20, 20, 0.9);
-    padding: 10px;
+    padding: 10px 20px;
     box-shadow: 0px 0px 15px rgba(211, 47, 47, 0.6);
+    position: relative;
+}
+
+/* 🎨 Logo mit Transparenz-Verlauf */
+.navbar-logo img {
+    height: 50px;
+    max-width: 200px;
+    object-fit: cover;
+    position: relative;
+}
+
+/* ✨ Fading Effekt nur auf das Logo */
+.navbar-logo {
+    padding-left: 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 /* 🌐 Desktop-Menü */
 .navbar-links {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
 .navbar-links a {
     text-decoration: none;
-    color: #d32f2f;
-    font-weight: bold;
-    margin: 5px;
-    padding: 10px;
-    transition: all 0.3s;
-    font-size: 16px;
-    border-bottom: 2px solid transparent;
-}
-
-.navbar-links a:hover, .navbar .active {
     color: #ffcc00;
-    text-shadow: 0 0 10px #ffcc00;
-    border-bottom: 2px solid #ffcc00;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    font-size: 16px;
 }
 
-/* 🍔 Hamburger Menü (Mobil) */
-.menu-icon {
-    display: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #d32f2f;
-    position: absolute;
-    right: 15px;
-    top: 15px;
+.navbar-links a:hover, .navbar-links .active {
+    color: #ffffff;
+    text-shadow: 0 0 10px #ffcc00;
 }
 
 /* 📱 Mobiles Menü */
@@ -90,7 +97,7 @@ body {
 }
 
 .mobile-menu a {
-    color: #d32f2f;
+    color: #ffcc00;
     font-size: 1.5em;
     margin: 15px;
     text-decoration: none;
@@ -98,20 +105,19 @@ body {
 }
 
 .mobile-menu a:hover {
-    color: #ffcc00;
+    color: #ffffff;
     text-shadow: 0 0 10px #ffcc00;
 }
 
-.close-menu {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    font-size: 40px;
+/* 🍔 Hamburger Menü Icon */
+.menu-icon {
+    display: none;
+    font-size: 30px;
     cursor: pointer;
     color: #ffcc00;
 }
 
-/* 📱 Responsive Design */
+/* 📱 Responsive Design für Mobilgeräte */
 @media (max-width: 768px) {
     .navbar-links {
         display: none;
@@ -119,10 +125,6 @@ body {
 
     .menu-icon {
         display: block;
-    }
-
-    .container {
-        width: calc(100% - 20px); /* ✅ Abstand auf kleineren Geräten auf 10px pro Seite reduzieren */
     }
 }
 
@@ -505,4 +507,98 @@ ul li {
 
 .user-table tbody tr:hover {
     background: rgba(255, 0, 0, 0.3);
+}
+
+/* 🌟 Zwei-Spalten-Layout für breite Bildschirme */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+@media (max-width: 900px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 🆕 News Box */
+.news-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.news-list li {
+    font-size: 1.2em;
+    padding: 10px;
+    border: 1px solid rgba(211, 47, 47, 0.5);
+    background: rgba(0, 0, 0, 0.3);
+    margin: 5px 0;
+    border-radius: 8px;
+}
+
+/* 🎮 Discord Box */
+.discord-box {
+    background: rgba(47, 47, 211, 0.8);
+    text-align: center;
+    padding: 20px;
+}
+
+.discord-box p {
+    font-size: 1.2em;
+    color: white;
+}
+
+.discord-join {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #5865F2;
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.discord-join:hover {
+    background: #404EED;
+}
+
+/* 🌌 Stilvolle große Buttons für wichtige Aktionen */
+.explore-button {
+    display: inline-block;
+    padding: 15px 25px;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-top: 15px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 0px 15px rgba(255, 204, 0, 0.4);
+}
+
+/* 🌌 Venator-Button */
+.venator-button {
+    background: linear-gradient(90deg, #ff5733, #ff3300);
+    border: 2px solid rgba(255, 85, 0, 0.8);
+}
+
+.venator-button:hover {
+    background: linear-gradient(90deg, #ff3300, #cc2900);
+    box-shadow: 0px 0px 20px rgba(255, 85, 0, 1);
+}
+
+/* 📖 Wiki-Button */
+.wiki-button {
+    background: linear-gradient(90deg, #0099ff, #0055cc);
+    border: 2px solid rgba(0, 85, 204, 0.8);
+}
+
+.wiki-button:hover {
+    background: linear-gradient(90deg, #0055cc, #003399);
+    box-shadow: 0px 0px 20px rgba(0, 85, 204, 1);
 }
