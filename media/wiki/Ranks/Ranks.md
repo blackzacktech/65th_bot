@@ -18,7 +18,7 @@ Diese Ränge sind für die **strategische Führung** und **Verwaltung der gesamt
 
 | **Rang** | **Titel** | **Ausrüstung** |
 |----------|------------|--------------|
-| <span class="color-goldorange">*@C*-CDR</span> | Chief Marshal Commander | Custom Avatar |
+| <span class="color-goldorange">*C*-CDR</span> | Chief Marshal Commander | Custom Avatar |
 | <span class="color-goldorange">S-CDR</span> | Supervising (Senior) Commander | Custom Avatar |
 | <span class="color-goldorange">CDR</span> | Commander | Custom Avatar |
 
@@ -114,9 +114,32 @@ Die Hound Staffel ist eine spezialisierte Einheit innerhalb der Coruscant Guard,
 
 ---
 
+## ✅ **Beförderungsrichtlinien**  
+Die Ränge innerhalb der **Coruscant Guard** werden nicht automatisch vergeben, sondern müssen durch **Leistung, Engagement und Teilnahme an Missionen und Trainings** verdient werden.
+
+### 📌 **Beförderungen innerhalb der Mannschaftsränge**  
+🔹 Soldaten können innerhalb der **CG-Mannschaftsränge** aufsteigen, indem sie regelmäßig an **Events, Trainings und “On Duty”-Einsätzen** teilnehmen.  
+🔹 Beförderungen innerhalb dieser Ränge dürfen **nur durch [Commanding Officers] vergeben** werden.  
+🔹 - **CG-Coruscant Guards Officer** dürfen Beförderungen durchführen, wenn mindestens ein - [Commanding Officer] - oder höher **anwesend** ist.  
+🔹 Der **Aufstieg von C-CPL | Chief Corporal auf SGT | Sergeant** erfordert eine spezielle **Fortbildung**, die durch einen - [Commanding Officer] - oder höher durchgeführt wird.
+
+---
+
+### 📌 **Beförderungen innerhalb der Offiziersränge**  
+🔹 Die erste Beförderung innerhalb der **CG-Coruscant Guards Officer** erfordert ein **Training**, das vom Bewerber **eigenständig unter Anleitung eines [Commanding Officers] geleitet** wird.  
+🔹 Alle weiteren Beförderungen innerhalb der **Offiziersränge** werden ausschließlich von **[Commandern]** vergeben.  
+🔹 Ein - [Commanding Officer] - darf einen **CG-Coruscant Guards Officer** nur nach **einer internen Abstimmung** und Rücksprache mit einem **[Commander]** befördern.
+
+---
+
+### 📌 **Beförderungen in den Rang eines Commanders**  
+🔹 Der Rang eines **[Commanders]** wird nicht durch reguläre Beförderungen erreicht, sondern durch eine **interne Abstimmung der bestehenden [Commander]**.  
+🔹 Die Beförderung zum **Commander** erfordert zusätzlich die **Zustimmung des Chief Marshal Commanders (*C*-CDR) und des Supervising (Senior) Commanders (S-CDR)**.
+
+---
+
 ## 📜 **Fazit**  
 Die Ränge und Spezialeinheiten der Coruscant Guard repräsentieren eine hochgradig **effektive und vielseitige Militärstruktur**. Jeder Rang hat **klare Verantwortlichkeiten** und eine **spezifische Rolle innerhalb der Armee**. Während die Offiziere die **taktischen Entscheidungen** treffen, sind es die Soldaten und Spezialkräfte, die **die Republik in den schwierigsten Situationen verteidigen**.
 
 > *"Disziplin, Stärke, Loyalität – dies sind die Werte der Coruscant Guard."*  
 > **- Commander Rex**
-

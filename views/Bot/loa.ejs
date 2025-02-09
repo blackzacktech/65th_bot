@@ -7,7 +7,8 @@
         <ul class="stat-list">
             <% loaData.forEach(loa => { %>
                 <li class="active-loa">
-                    👤 <b><%= loa.username %></b> <br>
+                    👤 <h><%= loa.soldier_name || "Unbekannt" %></h>
+                    👤 <p>@<%= loa.username || "Unbekannt" %></p>
                     📅 <b>Von:</b> <%= loa.from_date !== "Unbekannt" ? loa.from_date : "Unbekannt" %> <br>
                     📅 <b>Bis:</b> <%= loa.to_date !== "Unbekannt" ? loa.to_date : "Unbekannt" %> <br>
                     📝 <b>Grund:</b> <%= loa.reason %> <br>

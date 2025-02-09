@@ -92,33 +92,31 @@ app.get('/loa', (req, res) => {
     const today = moment().format("YYYY-MM-DD"); // Sicheres Format für Vergleich
 
     db.all(
-        `SELECT username, from_date, to_date, reason 
+        `SELECT loa.username, loa.from_date, loa.to_date, loa.reason, users."Soldaten Name" AS soldier_name 
          FROM loa 
-         WHERE to_date >= DATE(?) 
-         ORDER BY to_date ASC`,
+         LEFT JOIN main_server_users AS users ON loa.user_id = users.user_id
+         WHERE loa.to_date >= DATE(?) 
+         ORDER BY loa.to_date ASC`,
         [today],
         (err, loaData) => {
             if (err) {
                 return res.status(500).send("❌ Fehler beim Laden der Abmeldungen.");
             }
 
-            // 🔄 **Datenbereinigung für Anzeige**
-            const cleanLoaData = loaData
-                .map(loa => {
-                    let fromDate = moment(loa.from_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
-                    let toDate = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+            const cleanLoaData = loaData.map(loa => {
+                let fromDate = moment(loa.from_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+                let toDate = moment(loa.to_date, ["YYYY-MM-DD", "DD.MM.YYYY"], true).format("DD.MM.YYYY");
+                let isActive = moment(toDate, "DD.MM.YYYY").isSameOrAfter(today, 'day');
 
-                    // ✅ **Heute ist aktiv**
-                    let isActive = moment(toDate, "DD.MM.YYYY").isSameOrAfter(today, 'day');
-
-                    return {
-                        username: loa.username || "Unbekannt",
-                        from_date: fromDate || "Unbekannt",
-                        to_date: toDate || "Unbekannt",
-                        reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben",
-                        isActive
-                    };
-                });
+                return {
+                    soldier_name: loa.soldier_name || "Unbekannt",
+                    username: loa.username || "Unbekannt",
+                    from_date: fromDate || "Unbekannt",
+                    to_date: toDate || "Unbekannt",
+                    reason: loa.reason && loa.reason.length > 5 ? loa.reason : "Kein Grund angegeben",
+                    isActive
+                };
+            });
 
             res.render('Bot/loa', { 
                 title: "Aktuelle Abmeldungen", 
