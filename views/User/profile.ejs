@@ -1,0 +1,15 @@
+<h1>👤 Mein Profil</h1>
+
+<div class="container">
+    <img src="<%= user.avatarURL %>" alt="Profilbild" class="profile-avatar-large">
+    <h2><%= soldierName %></h2>
+    <p>@<%= user.username %></p>
+
+    <form action="/profile/update" method="POST">
+        <label for="story">📖 Meine Geschichte:</label>
+        <textarea name="story" id="story" rows="4" placeholder="Erzähle deine persönliche Klonkrieger-Geschichte..."><%= story %></textarea>
+        <button type="submit">💾 Speichern</button>
+    </form>
+</div>
+
+<a href="/">🏠 Zurück</a>

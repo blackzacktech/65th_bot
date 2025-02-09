@@ -141,6 +141,13 @@ const db = new sqlite3.Database('./utils/database/database.sqlite', (err) => {
         `, (err) => {
             if (err) console.error('❌ Fehler beim Erstellen der broadcast_messages-Tabelle:', err);
         });
+        
+        db.run(`
+            CREATE TABLE IF NOT EXISTS user_stories (
+                user_id TEXT PRIMARY KEY,
+                story TEXT
+            )
+        `);
     }
 });
 

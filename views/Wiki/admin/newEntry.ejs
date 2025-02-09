@@ -1,0 +1,14 @@
+<h1>📝 Neuen Wiki-Artikel erstellen</h1>
+
+<form action="/wiki/new" method="POST">
+    <label>Kategorie:</label>
+    <input type="text" name="category" required>
+
+    <label>Titel:</label>
+    <input type="text" name="title" required>
+
+    <label>Inhalt:</label>
+    <textarea name="content" rows="10" required></textarea>
+
+    <button type="submit">💾 Speichern</button>
+</form>
