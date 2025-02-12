@@ -3,7 +3,8 @@
 <form action="/wiki/edit/<%= category %>/<%= entry %>" method="POST">
     <label>📜 Inhalt bearbeiten:</label>
     <textarea id="editor" name="content"><%= content %></textarea>
-    <button type="submit">💾 Änderungen speichern</button>
+    <button type="submit" class="save-button">💾 Speichern</button>
+    <span id="saving-text" class="hidden">💾 Speichern...</span>
 </form>
 
 <!-- TinyMCE Einbindung -->
@@ -13,9 +14,31 @@
         tinymce.init({
             selector: '#editor',
             menubar: true,
-            plugins: 'advlist autolink lists link charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime table paste help autosave bbcode codesample directionality emoticons fullscreen hr image media nonbreaking pagebreak quickbars save textpattern wordcount',
-            toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media codesample emoticons | removeformat | help',
-            branding: false
+            plugins: 'advlist autolink lists link charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime table help autosave codesample directionality emoticons fullscreen image media nonbreaking pagebreak quickbars save wordcount',
+            toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media codesample emoticons | removeformat | help | fullscreen',
+            branding: false,
+            skin: 'oxide-dark',
+            content_css: 'dark',
+            license_key: 'gpl',
+            forced_root_block: '', // Deaktiviert <p>-Tag um jeden Absatz
+            entity_encoding: 'raw', // Speichert reines HTML
+            setup: function(editor) {
+                editor.on('init', function() {
+                    document.querySelector('.tox-promotion').style.display = 'none';
+                });
+            }
         });
     });
+
+    function showSaving(form) {
+        let savingText = document.getElementById('saving-text');
+        let saveButton = document.getElementById('save-button');
+        saveButton.innerHTML = '💾 Speichern...';
+        savingText.classList.remove('hidden');
+
+        setTimeout(() => {
+            savingText.classList.add('hidden');
+            saveButton.innerHTML = '💾 Speichern';
+        }, 2000);
+    }
 </script>

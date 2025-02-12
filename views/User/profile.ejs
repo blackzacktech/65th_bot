@@ -22,16 +22,31 @@
         tinymce.init({
             selector: '#editor',
             menubar: true,
-            plugins: 'advlist autolink lists link charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime table paste help autosave bbcode codesample directionality emoticons fullscreen hr image media nonbreaking pagebreak quickbars save textpattern wordcount',
+            plugins: 'advlist autolink lists link charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime table help autosave codesample directionality emoticons fullscreen image media nonbreaking pagebreak quickbars save wordcount',
             toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media codesample emoticons | removeformat | help | fullscreen',
-            branding: false
+            branding: false,
+            skin: 'oxide-dark',
+            content_css: 'dark',
+            license_key: 'gpl',
+            forced_root_block: '', // Deaktiviert <p>-Tag um jeden Absatz
+            entity_encoding: 'raw', // Speichert reines HTML
+            setup: function(editor) {
+                editor.on('init', function() {
+                    document.querySelector('.tox-promotion').style.display = 'none';
+                });
+            }
         });
     });
 
     function showSaving(form) {
-        document.getElementById('saving-text').classList.remove('hidden');
+        let savingText = document.getElementById('saving-text');
+        let saveButton = document.getElementById('save-button');
+        saveButton.innerHTML = '💾 Speichern...';
+        savingText.classList.remove('hidden');
+
         setTimeout(() => {
-            document.getElementById('saving-text').classList.add('hidden');
+            savingText.classList.add('hidden');
+            saveButton.innerHTML = '💾 Speichern';
         }, 2000);
     }
 </script>

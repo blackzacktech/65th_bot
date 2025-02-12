@@ -5,4 +5,4 @@ pnpm-lock.yaml
 test.txt
 utils/database/*
 utils/files/*
-media/wiki/*
+media/wiki/

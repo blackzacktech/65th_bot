@@ -68,6 +68,12 @@ function isWikiEditor(user) {
 
 // Middleware: Benutzer für alle Templates verfügbar machen
 app.use((req, res, next) => {
+    if (req.user) {
+        req.user.avatarURL = req.user.avatar
+            ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=256`
+            : `https://cdn.discordapp.com/embed/avatars/${parseInt(req.user.discriminator, 10) % 5}.png`;
+    }
+
     res.locals.user = req.user || null;
     res.locals.isWikiEditor = isWikiEditor(req.user);
     res.locals.wikiEntry = null; // Standard: `null`, es sei denn, eine Wiki-Seite setzt sie
