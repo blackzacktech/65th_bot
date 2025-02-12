@@ -4,7 +4,8 @@
   "main": "bot.js",
   "invite-link": "https://discord.com/oauth2/authorize?client_id=1333895828175065119&permissions=137976867904&integration_type=0&scope=bot",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "soldaten_ct-discord_id-migration": "node migrations/update_instructor_ids.js"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,7 @@
     "node-fetch": "^2.7.0",
     "passport": "^0.7.0",
     "passport-discord": "^0.1.4",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "tinymce": "^7.6.1"
   }
 }

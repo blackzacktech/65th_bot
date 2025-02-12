@@ -5,11 +5,33 @@
     <h2><%= soldierName %></h2>
     <p>@<%= user.username %></p>
 
-    <form action="/profile/update" method="POST">
+    <form action="/profile/update" method="POST" onsubmit="showSaving(this)">
         <label for="story">📖 Meine Geschichte:</label>
-        <textarea name="story" id="story" rows="4" placeholder="Erzähle deine persönliche Klonkrieger-Geschichte..."><%= story %></textarea>
-        <button type="submit">💾 Speichern</button>
+        <textarea id="editor" name="story" rows="4" placeholder="Erzähle deine persönliche Klonkrieger-Geschichte..."><%= story %></textarea>
+        <button type="submit" class="save-button">💾 Speichern</button>
+        <span id="saving-text" class="hidden">💾 Speichern...</span>
     </form>
 </div>
 
-<a href="/">🏠 Zurück</a>
+<a href="/" class="back-button">🏠 Zurück</a>
+
+<!-- TinyMCE Einbindung -->
+<script src="/tinymce/tinymce.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        tinymce.init({
+            selector: '#editor',
+            menubar: true,
+            plugins: 'advlist autolink lists link charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime table paste help autosave bbcode codesample directionality emoticons fullscreen hr image media nonbreaking pagebreak quickbars save textpattern wordcount',
+            toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media codesample emoticons | removeformat | help | fullscreen',
+            branding: false
+        });
+    });
+
+    function showSaving(form) {
+        document.getElementById('saving-text').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('saving-text').classList.add('hidden');
+        }, 2000);
+    }
+</script>

@@ -91,6 +91,9 @@ app.use(bodyParser.json());
 // Lade Routen automatisch
 app.use('/', require('./routes/index'));
 
+app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
+
+
 //!------------------------------------------------------------------------------------------------------------
 
 //? 📌 Server starten

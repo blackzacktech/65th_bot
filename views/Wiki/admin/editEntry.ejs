@@ -1,16 +1,21 @@
 <h1>✏️ Bearbeiten: <%= entry %></h1>
 
 <form action="/wiki/edit/<%= category %>/<%= entry %>" method="POST">
+    <label>📜 Inhalt bearbeiten:</label>
     <textarea id="editor" name="content"><%= content %></textarea>
     <button type="submit">💾 Änderungen speichern</button>
 </form>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<!-- TinyMCE Einbindung -->
+<script src="/tinymce/tinymce.min.js"></script>
 <script>
-    var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-        lineNumbers: true,
-        mode: "markdown",
-        theme: "default"
+    document.addEventListener("DOMContentLoaded", function() {
+        tinymce.init({
+            selector: '#editor',
+            menubar: true,
+            plugins: 'advlist autolink lists link charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime table paste help autosave bbcode codesample directionality emoticons fullscreen hr image media nonbreaking pagebreak quickbars save textpattern wordcount',
+            toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media codesample emoticons | removeformat | help',
+            branding: false
+        });
     });
 </script>

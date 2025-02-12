@@ -1,6 +1,8 @@
 .env
 node_modules
 package-lock.json
+pnpm-lock.yaml
 test.txt
 utils/database/*
 utils/files/*
+media/wiki/*

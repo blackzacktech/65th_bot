@@ -41,41 +41,6 @@
                 <a href="/login">🔑 Login mit Discord</a>
             <% } %>
         </div>
-        </div>
-
-        <!-- 🍔 Hamburger Menü Button für mobile Ansicht -->
-        <div class="menu-icon" onclick="toggleMobileMenu()">☰</div>
-    </div>
-
-    <!-- 📱 Mobiles Menü -->
-    <div class="mobile-menu" id="mobileMenu">
-        <span class="close-menu" onclick="toggleMobileMenu()">✖</span>
-        <a href="/">🏠 Home</a>
-        <a href="/wiki">📜 Wiki</a>
-        <a href="/venator">🚀 Venator Base</a>
-        <a href="/user">🛡️ Discord Mitglieder</a>
-        <a href="/loa">📅 Abmeldungen</a>
-        <a href="/invite-server" target="_blank">🎮 Discord</a>
-
-        <% if (user) { %>
-                <!-- Profil-Menü mit Dropdown -->
-                <div class="profile-dropdown">
-                    <a href="javascript:void(0)" class="profile-button" onclick="toggleProfileMenu()">
-                        <img src="<%= user.avatarURL %>" class="profile-avatar">
-                        <%= user.username %>
-                    </a>
-                    <div class="profile-menu" id="profileMenu">
-                        <a href="/profile">🔎 Mein Profil</a>
-                        <% if (isWikiEditor) { %>
-                            <a href="/wiki/new">📝 Neuen Wiki-Artikel erstellen</a>
-                        <% } %>
-                        <a href="/logout">🔓 Logout</a>
-                    </div>
-                </div>
-            <% } else { %>
-                <a href="/login">🔑 Login mit Discord</a>
-            <% } %>
-        </div>
     </div>
 
     <!-- 📌 Hauptinhalt der Seiten -->
@@ -100,6 +65,20 @@
             const menu = document.getElementById("profileMenu");
             menu.style.display = (menu.style.display === "block") ? "none" : "block";
         }
+    </script>
+
+    <!-- TinyMCE Einbindung -->
+    <script src="/tinymce/tinymce.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            tinymce.init({
+                selector: 'textarea',
+                menubar: false,
+                plugins: 'advlist autolink lists link charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime table paste help',
+                toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+                branding: false
+            });
+        });
     </script>
 
     <style>
