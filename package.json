@@ -1,10 +1,8 @@
 {
   "name": "65th_bot",
   "version": "1.0.0",
-  "main": "bot.js",
   "invite-link": "https://discord.com/oauth2/authorize?client_id=1333895828175065119&permissions=137976867904&integration_type=0&scope=bot",
   "scripts": {
-    "start": "node bot.js",
     "soldaten_ct-discord_id-migration": "node migrations/update_instructor_ids.js"
   },
   "keywords": [],
